@@ -2,9 +2,14 @@ name: SidonPay User Web App CI/CD Pipeline
 
 on:
   push:
-    branches: [ development, staging, production, main, ugo/setup-user-web-app ]
+    branches: [development, staging, production, main, ugo/setup-user-web-app]
   pull_request:
-    branches: [ development, staging, production, main, ugo/setup-user-web-app ]
+    branches: [development, staging, production, main, ugo/setup-user-web-app]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   test:
@@ -27,29 +32,21 @@ jobs:
       - name: Build application
         run: npm run build
 
-    deploy-ugo-setup:
+  deploy-ugo-setup:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/ugo/setup-user-web-app'
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     steps:
       - uses: actions/checkout@v3
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-
       - name: Install dependencies
         run: npm install
-
       - name: Build application
         run: npm run build
-
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v2
         with:
@@ -67,10 +64,6 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-
-
-
-
   deploy-staging:
     needs: test
     runs-on: ubuntu-latest
@@ -79,11 +72,9 @@ jobs:
       - uses: actions/checkout@v3
       - name: Deploy to Staging Environment
         run: |
-          echo " Deploying SidonPay User Web App to Staging"
+          echo "Deploying SidonPay User Web App to Staging"
           echo "Branch: staging"
           echo "Environment: staging.user.sidonpay.com"
-          # Example deployment command:
-          # npx vercel --prod --token ${{ secrets.VERCEL_USER_TOKEN }}
 
   deploy-production:
     needs: test
@@ -93,11 +84,9 @@ jobs:
       - uses: actions/checkout@v3
       - name: Deploy to Production Environment
         run: |
-          echo "🏭 Deploying SidonPay User Web App to Production"
+          echo "Deploying SidonPay User Web App to Production"
           echo "Branch: production"
           echo "Environment: app.user.sidonpay.com"
-          # Example deployment command:
-          # npx vercel --prod --token ${{ secrets.VERCEL_USER_TOKEN }}
 
   deploy-main:
     needs: test
@@ -105,19 +94,15 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-
       - name: Install dependencies
         run: npm install
-
       - name: Build application
         run: npm run build
-
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
