@@ -1,62 +1,57 @@
-name: SidonPay User Web App - Ugo Feature CI/CD
+name: SidonPay User Web App CI/CD Pipeline
 
 on:
   push:
-    branches: [ ugo/setup-user-web-app ]
+    branches: [ ugo/setup-user-web-app, main ]
   pull_request:
-    branches: [ ugo/setup-user-web-app ]
+    branches: [ ugo/setup-user-web-app, main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Run linting
+      run: npm run lint
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: npm
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run lint
-        run: npm run lint
-
-  deploy:
+  # -------------------------
+  # DEPLOY from MAIN → GH PAGES
+  # -------------------------
+  deploy-main:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/ugo/setup-user-web-app'
-
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
-      pages: write
-      id-token: write
-
     steps:
       - uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          cache: npm
+          node-version: '18'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build Vite project
+      - name: Build application
         run: npm run build
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: dist
-
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx gh-pages -d dist
+          echo "🚀 Deployed SidonPay User Web App to GitHub Pages"
