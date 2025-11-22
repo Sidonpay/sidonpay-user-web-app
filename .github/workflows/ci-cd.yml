@@ -27,7 +27,7 @@ jobs:
       - name: Build application
         run: npm run build
 
-  deploy-ugo-setup:
+    deploy-ugo-setup:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/ugo/setup-user-web-app'
@@ -51,7 +51,7 @@ jobs:
         run: npm run build
 
       - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v2
         with:
           path: ./dist
 
@@ -66,6 +66,7 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
 
 
 
