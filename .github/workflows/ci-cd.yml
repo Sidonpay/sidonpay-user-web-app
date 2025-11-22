@@ -1,114 +1,62 @@
-name: SidonPay User Web App CI/CD Pipeline
+name: SidonPay User Web App - Ugo Feature CI/CD
 
 on:
   push:
-    branches: [development, staging, production, main, ugo/setup-user-web-app]
+    branches: [ ugo/setup-user-web-app ]
   pull_request:
-    branches: [development, staging, production, main, ugo/setup-user-web-app]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+    branches: [ ugo/setup-user-web-app ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
-      
+          node-version: 18
+          cache: npm
+
       - name: Install dependencies
         run: npm install
-      
-      - name: Run linting
-        run: npm run lint
-      
-      - name: Build application
-        run: npm run build
 
-  deploy-ugo-setup:
+      - name: Run lint
+        run: npm run lint
+
+  deploy:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/ugo/setup-user-web-app'
+
     permissions:
-      contents: read
+      contents: write
       pages: write
       id-token: write
+
     steps:
       - uses: actions/checkout@v3
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: 18
+          cache: npm
+
       - name: Install dependencies
         run: npm install
-      - name: Build application
+
+      - name: Build Vite project
         run: npm run build
-      - name: Upload artifact for GitHub Pages
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: ./dist
+          path: dist
 
-  deploy-pages:
-    needs: deploy-ugo-setup
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/ugo/setup-user-web-app'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-  deploy-staging:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/staging'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Deploy to Staging Environment
-        run: |
-          echo "Deploying SidonPay User Web App to Staging"
-          echo "Branch: staging"
-          echo "Environment: staging.user.sidonpay.com"
-
-  deploy-production:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/production'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Deploy to Production Environment
-        run: |
-          echo "Deploying SidonPay User Web App to Production"
-          echo "Branch: production"
-          echo "Environment: app.user.sidonpay.com"
-
-  deploy-main:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm install
-      - name: Build application
-        run: npm run build
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+        uses: actions/deploy-pages@v2
