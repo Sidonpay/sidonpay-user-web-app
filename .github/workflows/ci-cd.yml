@@ -2,9 +2,9 @@ name: SidonPay User Web App CI/CD Pipeline
 
 on:
   push:
-    branches: [ development, staging, production, main ]
+    branches: [ development, staging, production, main, ugo/setup-user-web-app ]
   pull_request:
-    branches: [ development, staging, production, main ]
+    branches: [ development, staging, production, main, ugo/setup-user-web-app ]
 
 jobs:
   test:
