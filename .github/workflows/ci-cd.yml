@@ -27,19 +27,32 @@ jobs:
       - name: Build application
         run: npm run build
 
-  deploy-dev:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/development'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Deploy to Development Environment
-        run: |
-          echo " Deploying SidonPay User Web App to Development"
-          echo "Branch: development"
-          echo "Environment: dev.user.sidonpay.com"
-          # Example deployment command:
-          # npx vercel --prod --token ${{ secrets.VERCEL_USER_TOKEN }}
+  deploy-ugo-setup:
+   needs: test
+   runs-on: ubuntu-latest
+   if: github.ref == 'refs/heads/ugo/setup-user-web-app'
+   steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build application
+      run: npm run build
+
+    - name: Deploy to GitHub Pages (ugo/setup-user-web-app)
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+        publish_branch: gh-pages-ugo-setup
+
 
   deploy-staging:
     needs: test
