@@ -69,16 +69,28 @@ jobs:
         # Example deployment command:
         # npx vercel --prod --token ${{ secrets.VERCEL_USER_TOKEN }}
 
-  deploy-main:
+    deploy-main:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-    - uses: actions/checkout@v3
-    - name: Deploy to Main/Live Environment
-      run: |
-        echo " Deploying SidonPay User Web App to Main/Live"
-        echo "Branch: main"
-        echo "Environment: user.sidonpay.com"
-        # Example deployment command:
-        # npx vercel --prod --token ${{ secrets.VERCEL_USER_TOKEN }}
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build application
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+

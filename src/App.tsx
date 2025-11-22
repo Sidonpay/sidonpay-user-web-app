@@ -19,14 +19,8 @@ const App: React.FC = () => {
       <Navbar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route
-          path="/login"
-          element={<Login onLogin={handleLogin} />}
-        />
-        <Route
-          path="/signup"
-          element={<Signup />}
-        />
+        <Route path="/login" element={<Login onLogin={handleLogin} />}/>
+        <Route path="/signup" element={<Signup />}/>
         <Route
           path="/dashboard"
           element={
