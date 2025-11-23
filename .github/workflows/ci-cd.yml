@@ -1,52 +1,59 @@
-name: SidonPay User Web App CI/CD Pipeline
+name: SidonPay User Web App CI/CD
 
 on:
   push:
-    branches: [ ugo/setup-user-web-app, main ]
+    branches:
+      - ugo/setup-user-web-app   # your feature branch
+      - main                     # optional: production deploy from main
   pull_request:
-    branches: [ ugo/setup-user-web-app, main ]
+    branches:
+      - ugo/setup-user-web-app
+      - main
 
 jobs:
   test:
+    name: 🧪 Test & Lint
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm install
-    
-    - name: Run linting
-      run: npm run lint
 
-
-  # -------------------------
-  # DEPLOY from MAIN → GH PAGES
-  # -------------------------
-  deploy-main:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    permissions:
-      contents: write
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: 18
+          cache: npm
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build application
+      - name: Run lint
+        run: npm run lint
+
+  deploy:
+    name: 🚀 Build & Deploy to GitHub Pages
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/ugo/setup-user-web-app' || github.ref == 'refs/heads/main'
+
+    permissions:
+      contents: write       # Needed to push to gh-pages branch
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
         run: npm run build
 
       - name: Deploy to GitHub Pages
@@ -54,4 +61,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npx gh-pages -d dist
-          echo "🚀 Deployed SidonPay User Web App to GitHub Pages"
+          echo "✅ Deployed SidonPay User Web App to GitHub Pages"
