@@ -3,8 +3,7 @@
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 CI/CD:
-- `dev` deploys to GitHub Pages with base path `/sidonpay-user-web-app/`
-- `main` deploys to Vercel with base path `/`
+- `dev` and `main` deploy to GitHub Pages with base path `/sidonpay-user-web-app/`
 
 Currently, two official plugins are available:
 
