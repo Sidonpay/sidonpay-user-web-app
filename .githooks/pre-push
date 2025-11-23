@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Enforce lint/build on protected branches before push
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [ "$branch" = "dev" ] || [ "$branch" = "main" ]; then
+  echo "Running lint and build checks for $branch..."
+
+  if [ "$branch" = "dev" ]; then
+    export VITE_BASE_PATH=/sidonpay-user-web-app/
+  fi
+
+  npm run lint && npm run build
+else
+  echo "Skipping enforced checks for branch: $branch"
+fi
