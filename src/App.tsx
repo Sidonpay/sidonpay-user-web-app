@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NotFound from "./pages/NotFound";
 
 const App: React.FC = () => {
-  // Simple auth simulation
+  // Simple auth simulation (placeholder until real auth is wired up)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLogin = () => setIsLoggedIn(true);
@@ -19,8 +20,8 @@ const App: React.FC = () => {
       <Navbar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login onLogin={handleLogin} />}/>
-        <Route path="/signup" element={<Signup />}/>
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/signup" element={<Signup />} />
         <Route
           path="/dashboard"
           element={
@@ -29,6 +30,7 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

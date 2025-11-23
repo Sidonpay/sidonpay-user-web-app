@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Landing: React.FC = () => {
   return (
@@ -10,18 +11,18 @@ const Landing: React.FC = () => {
         Your user web app shell is ready.
       </p>
       <div className="flex gap-4">
-        <a
-          href="/login"
+        <Link
+          to="/login"
           className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
         >
           Login
-        </a>
-        <a
-          href="/signup"
+        </Link>
+        <Link
+          to="/signup"
           className="px-6 py-2 border border-indigo-600 text-indigo-600 rounded hover:bg-indigo-50"
         >
           Signup
-        </a>
+        </Link>
       </div>
     </div>
   );
