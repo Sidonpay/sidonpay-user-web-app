@@ -68,7 +68,7 @@ const UserDetails = () => {
         </div>
       </div>
 
-      {/* Buttons */}
+      {/* Button */}
       <div className="mt-8 flex gap-4">
         <Link
           to={`/admin/users/edit/${user.id}`}
