@@ -8,7 +8,7 @@ const NotFound: React.FC = () => {
       <p className="text-gray-600 mb-6">The page you are looking for does not exist.</p>
       <Link
         to="/"
-        className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+        className="px-6 py-2 bg-green-600 text-white rounded hover:bg-indigo-700"
       >
         Go home
       </Link>
