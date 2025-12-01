@@ -3,15 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import type { User } from "../../context/AuthContext";
 
+type RoleType = "user" | "admin" | "superadmin";
+
 export default function Login() {
+
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"user" | "admin" | "superadmin">("user");
-
+  const [role, setRole] = useState<RoleType>("user");
   const handleLogin = () => {
+    console.log('Attempting login with:', email, 'and password:', password);
     const loggedUser: User = {
       id: crypto.randomUUID(),
       name: email.split("@")[0],
@@ -69,23 +72,15 @@ export default function Login() {
           {/* ROLE SELECT */}
           <select
             value={role}
-            onChange={(e) =>
-              setRole(e.target.value as "user" | "admin" | "superadmin")
-            }
-            className="w-full p-3 border rounded-lg"
-          >
+            onChange={(e) => setRole(e.target.value as RoleType)}
+            className="w-full p-3 border rounded-lg">
             <option value="user">User</option>
             <option value="admin">Admin</option>
             <option value="superadmin">Super Admin</option>
           </select>
-
           <button
             onClick={handleLogin}
-            className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700"
-          >
-            Login
-          </button>
-
+            className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">Login</button>
           <p className="text-center text-gray-500">
             Don't have an account?{" "}
             <a href="/#/signup" className="text-green-600 font-semibold">
