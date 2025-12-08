@@ -1,27 +1,42 @@
-import React, { useState } from "react";
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
-import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
-import Navbar from "./components/Navbar";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { useState } from "react";
+import {
+  HashRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Login from "./pages/auth/LoginPage";
+import Signup from "./pages/auth/Signup";
+import OTPVerification from "./pages/auth/OTPVerification";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+import Dashboard from "./pages/dashboard/Dashboard";
+import ProtectedRoute from "./routes/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
-const App: React.FC = () => {
-  // Simple auth simulation (placeholder until real auth is wired up)
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+function App() {
+  // Simple simulation of auth state - In real app, this would be context/global state
+  // Initialize auth state based on localStorage token existence
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return !!localStorage.getItem("userAccessToken");
+  });
 
-  const handleLogin = () => setIsLoggedIn(true);
-  const handleLogout = () => setIsLoggedIn(false);
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
 
   return (
     <Router>
-      <Navbar isLoggedIn={isLoggedIn} onLogout={handleLogout} />
       <Routes>
-        <Route path="/" element={<Landing />} />
+        {/* Public Routes */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/otp-verify" element={<OTPVerification />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -30,10 +45,12 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* Catch all */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
-};
+}
 
 export default App;

@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { describe, it, expect } from "vitest";
-import ProtectedRoute from "../components/ProtectedRoute";
+import ProtectedRoute from "../routes/ProtectedRoute";
 
 describe("ProtectedRoute", () => {
   it("redirects to login when not authenticated", () => {

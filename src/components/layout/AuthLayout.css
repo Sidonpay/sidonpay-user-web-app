@@ -1,0 +1,63 @@
+.auth-layout-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background-color: #f8fafc; /* light gray/white bg */
+}
+
+/* Left Panel (Image) */
+.auth-left-panel {
+  position: relative;
+  width: 45%;
+  background-color: #0f172a; /* Dark navy */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.auth-bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.9;
+}
+
+/* Right Panel (Form) */
+.auth-right-panel {
+  width: 55%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: white;
+  padding: 2rem;
+}
+
+/* The curved edge overlay */
+.auth-curve-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -1px; /* Overlap slightly to prevent gaps */
+  width: 100px; /* Adjust based on curve depth */
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0 0 C 50 20 50 80 0 100 Z" fill="white"/></svg>')
+    no-repeat;
+  background-size: 100% 100%;
+ 
+  display: none; /* Let's use clip-path in the component style instead, it's cleaner */
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .auth-layout-container {
+    flex-direction: column;
+  }
+  .auth-left-panel {
+    display: none; /* Hide image on mobile usually, or make it a header */
+  }
+  .auth-right-panel {
+    width: 100%;
+  }
+}

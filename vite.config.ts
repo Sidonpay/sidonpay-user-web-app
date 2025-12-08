@@ -12,6 +12,15 @@ export default defineConfig({
     }),
   ],
   base,
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://sidonpay-be-2bnn.vercel.app",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
   // @ts-expect-error - Vitest config lives here but is not part of Vite's types
   test: {
     globals: true,
