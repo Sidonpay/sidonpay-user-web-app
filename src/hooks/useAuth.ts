@@ -1,5 +1,4 @@
 import { useContext } from 'react';
-// FIX: AuthContextType is now correctly imported as an exported interface.
 import { AuthContext, type AuthContextType } from '../context/AuthContext';
 
 export const useAuth = () => {
