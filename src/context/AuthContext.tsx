@@ -1,74 +1,65 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  type ReactNode,
-} from "react";
+import {
+    createContext,
+    useState,
+    useEffect,
+    useMemo,
+    type ReactNode
+} from 'react';
 
+// --- Types (Exported for use in other files) ---
 export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: "user" | "admin" | "superadmin";
+    id: string;
+    name: string;
+    email: string;
+    role: "user" | "admin" | "superadmin";
 }
-
 
 export type Role = "user" | "admin" | "superadmin";
 
-
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (userData: User) => void;
-  logout: () => void;
+export interface AuthContextType {
+    user: User | null;
+    isAuthenticated: boolean;
+    login: (userData: User) => void;
+    logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+// --- AuthProvider Component (Default Export) ---
+export default function AuthProvider({ children }: { children: ReactNode }) {
+    const [user, setUser] = useState<User | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    useEffect(() => {
+        const saved = localStorage.getItem("sidonpay-auth");
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            setUser(parsed.user);
+            setIsAuthenticated(parsed.isAuthenticated);
+        }
+    }, []);
 
-  // Load saved auth from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("sidonpay-auth");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setUser(parsed.user);
-      setIsAuthenticated(parsed.isAuthenticated);
-    }
-  }, []);
+    const login = (userData: User) => {
+        setUser(userData);
+        setIsAuthenticated(true);
+        localStorage.setItem("sidonpay-auth", JSON.stringify({ user: userData, isAuthenticated: true }));
+    };
 
-  const login = (userData: User) => {
-    setUser(userData);
-    setIsAuthenticated(true);
+    const logout = () => {
+        setUser(null);
+        setIsAuthenticated(false);
+        localStorage.removeItem("sidonpay-auth");
+    };
 
-    // save to localStorage
-    localStorage.setItem(
-      "sidonpay-auth",
-      JSON.stringify({
-        user: userData,
-        isAuthenticated: true,
-      })
+    const contextValue = useMemo(() => ({
+        user,
+        isAuthenticated,
+        login,
+        logout,
+    }), [user, isAuthenticated]);
+
+    return (
+        <AuthContext.Provider value={contextValue}>
+            {children}
+        </AuthContext.Provider>
     );
-  };
-
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem("sidonpay-auth");
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
-    {children}
-  </AuthContext.Provider>
-);
-};
-
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
-  return ctx;
-};
+}

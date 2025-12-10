@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 import type { User } from "../../context/AuthContext";
 
 export default function SignupPage() {
@@ -38,7 +38,7 @@ export default function SignupPage() {
         <img
           src="/Subtract.png"
           alt="signup background"
-        className="max-w-[500px] w-full h-75 mx-auto"
+          className="max-w-[500px] w-full h-75 mx-auto"
         />
       </div>
 

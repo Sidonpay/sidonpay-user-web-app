@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -148,7 +148,7 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Footer / notes */}
-            </main>
+          </main>
         </div>
       </div>
     </div>
@@ -199,7 +199,7 @@ const RecentUsersTable: React.FC = () => {
               </td>
               <td className="py-3 text-right">
                 <button
-                  onClick={() => {}}
+                  onClick={() => { }}
                   className="text-sm text-blue-600"
                 >
                   View

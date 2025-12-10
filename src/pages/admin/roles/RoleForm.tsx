@@ -26,7 +26,7 @@ const RoleForm = () => {
     if (roleId) {
       await mockRolesApi.update(roleId, { name: form.name });
     } else {
-      await mockRolesApi.create({ name: form.name });
+      await mockRolesApi.create({ name: form.name, isActive: true });
     }
 
     navigate("/admin/roles");

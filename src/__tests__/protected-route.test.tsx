@@ -1,17 +1,24 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import ProtectedRoute from "../components/ProtectedRoute";
+
+// Mock useAuth
+const mockUseAuth = vi.fn();
+vi.mock("../hooks/useAuth", () => ({
+  useAuth: () => mockUseAuth(),
+}));
 
 describe("ProtectedRoute", () => {
   it("redirects to login when not authenticated", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: false, user: null });
     render(
       <MemoryRouter initialEntries={["/dashboard"]}>
         <Routes>
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute isLoggedIn={false}>
+              <ProtectedRoute>
                 <div>Secret</div>
               </ProtectedRoute>
             }
@@ -25,13 +32,14 @@ describe("ProtectedRoute", () => {
   });
 
   it("renders children when authenticated", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, user: { role: 'user' } });
     render(
       <MemoryRouter initialEntries={["/dashboard"]}>
         <Routes>
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute isLoggedIn>
+              <ProtectedRoute>
                 <div>Secret</div>
               </ProtectedRoute>
             }

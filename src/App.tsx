@@ -15,7 +15,7 @@ import UserDetails from "./pages/admin/users/UserDetails";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
-import { AuthProvider } from "./context/AuthContext";
+import AuthProvider from "./context/AuthContext";
 
 const App = () => {
   return (
