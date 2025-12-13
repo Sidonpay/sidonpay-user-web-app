@@ -18,23 +18,29 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
         try {
+            // Check for both user data and token
             const saved = localStorage.getItem("sidonpay-auth");
-            return saved ? JSON.parse(saved).isAuthenticated : false;
+            const token = localStorage.getItem("token");
+            return !!(saved && token);
         } catch {
             return false;
         }
     });
 
-    const login = (userData: User) => {
+    const login = (userData: User, token?: string) => {
         setUser(userData);
         setIsAuthenticated(true);
         localStorage.setItem("sidonpay-auth", JSON.stringify({ user: userData, isAuthenticated: true }));
+        if (token) {
+            localStorage.setItem("token", token);
+        }
     };
 
     const logout = () => {
         setUser(null);
         setIsAuthenticated(false);
         localStorage.removeItem("sidonpay-auth");
+        localStorage.removeItem("token");
     };
 
     const contextValue = useMemo(() => ({

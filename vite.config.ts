@@ -18,4 +18,13 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "./src/setupTests.ts",
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://sidonpay-be-2bnn.vercel.app',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 });

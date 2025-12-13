@@ -13,7 +13,7 @@ const Landing: React.FC = () => {
       <div className="flex gap-4">
         <Link
           to="/login"
-          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-indigo-700"
+          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-emerald-800"
         >
           Login
         </Link>
