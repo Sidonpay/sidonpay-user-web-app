@@ -60,6 +60,7 @@ export default function SignupPage() {
       } else {
         setError(response.message || "Signup failed");
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Signup Error:", err);
       const errorMessage = err.response?.data?.error?.message || err.response?.data?.message || err.message || "Something went wrong. Please try again.";
@@ -239,6 +240,19 @@ export default function SignupPage() {
                 </button>
               </div>
             </div>
+
+            {password.length > 0 && !passwordCriteria.every(c => c.valid) && (
+              <div className="mt-1 ml-1 grid grid-cols-2 gap-x-2 gap-y-0.5">
+                {passwordCriteria.map((criterion, index) => (
+                  <div key={index} className="flex items-center space-x-1">
+                    <div className={`w-1.5 h-1.5 rounded-full ${criterion.valid ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                    <span className={`text-[9px] ${criterion.valid ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
+                      {criterion.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Terms Checkbox */}
             <div className="flex items-start">

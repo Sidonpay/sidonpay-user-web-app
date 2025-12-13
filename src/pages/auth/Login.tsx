@@ -46,6 +46,7 @@ export default function Login() {
             } else {
                 setError(response.message || "Login failed");
             }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             console.error("Login Error:", err);
             const errorMessage = err.response?.data?.error?.message || err.response?.data?.message || err.message || "Something went wrong. Please try again.";
