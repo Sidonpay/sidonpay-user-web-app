@@ -51,6 +51,7 @@ const SignUp: React.FC = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -76,12 +77,24 @@ const SignUp: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  //   e.preventDefault();
+  //   if (validate()) {
+  //     console.log("Form submitted:", formData);
+  //   }
+  // };
+
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (validate()) {
-      console.log("Form submitted:", formData);
+      setIsLoading(true);
+      setTimeout(() => {
+        setIsLoading(false);
+        console.log("Form submitted:", formData);
+      }, 2000);
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center  px-4">
@@ -239,17 +252,32 @@ const SignUp: React.FC = () => {
           </div>
 
           {/* Submit Button */}
-          <button
+          {/* <button
             onClick={handleSubmit}
             className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg text-sm transition"
           >
             Create Account
-          </button>
+          </button> */}
 
-          <div className="flex items-center my-4">
-          <div className="w-2 h-2 rounded-full bg-gray-400 shrink-0" />
-          <div className="flex-1 h-px bg-gray-300" />
-          <div className="flex-1 h-px bg-gray-300" />
+           <button
+           onClick={handleSubmit}
+             disabled={isLoading}
+             className="w-full bg-[#2D7A51] hover:bg-green-700 disabled:opacity-80 text-white font-semibold py-2.5 rounded-lg text-sm transition flex items-center justify-center gap-2"
+               >
+             {isLoading ? (
+             <>
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Create Account
+             </>
+             ) : (
+            "Create Account"
+           )}
+             </button>
+
+            <div className="flex items-center my-4">
+              <div className="w-2 h-2 rounded-full bg-gray-400 shrink-0" />
+              <div className="flex-1 h-px bg-gray-300" />
+              <div className="flex-1 h-px bg-gray-300" />
              <span className="text-xs text-gray-400 px-3">OR</span>
                 <div className="flex-1 h-px bg-gray-300" />
                 <div className="w-2 h-2 rounded-full bg-gray-400 shrink-0" />
