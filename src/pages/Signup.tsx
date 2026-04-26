@@ -1,24 +1,7 @@
-// import React from "react";
-
-// const Signup: React.FC = () => {
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-//       <h2 className="text-3xl font-semibold text-gray-800">Signup Page</h2>
-//     </div>
-//   );
-// };
-
-// export default Signup;
-
-
-
-
 import { useState } from "react";
 import Logo from "../assets/SidonPay Logo.png";
 import SideImage from "../assets/SideImage.png";
 import {Eye, EyeOff, User, Mail, Phone, Lock} from "lucide-react";
-
-
 
 interface FormData {
   fullName: string;
@@ -76,13 +59,6 @@ const SignUp: React.FC = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  // const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
-  //   e.preventDefault();
-  //   if (validate()) {
-  //     console.log("Form submitted:", formData);
-  //   }
-  // };
 
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -250,14 +226,6 @@ const SignUp: React.FC = () => {
             </label>
             {errors.agreedToTerms && <p className="text-xs text-red-500 mt-1">{errors.agreedToTerms}</p>}
           </div>
-
-          {/* Submit Button */}
-          {/* <button
-            onClick={handleSubmit}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg text-sm transition"
-          >
-            Create Account
-          </button> */}
 
            <button
            onClick={handleSubmit}
