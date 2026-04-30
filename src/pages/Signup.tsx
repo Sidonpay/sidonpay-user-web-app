@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Logo from "../assets/SidonPay Logo.png";
 import SideImage from "../assets/SideImage.png";
 import {Eye, EyeOff, User, Mail, Phone, Lock} from "lucide-react";
@@ -35,6 +36,7 @@ const SignUp: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -66,6 +68,7 @@ const SignUp: React.FC = () => {
       setIsLoading(true);
       setTimeout(() => {
         setIsLoading(false);
+        navigate("/verify-account", {state: {email: formData.email}});
         console.log("Form submitted:", formData);
       }, 2000);
     }
@@ -265,7 +268,7 @@ const SignUp: React.FC = () => {
           {/* Login Link */}
           <p className="text-center text-xs text-gray-500 mt-4">
             Already have an account?{" "}
-            <span className="text-green-600 font-semibold cursor-pointer hover:underline">Login</span>
+            <span onClick={() => navigate("/login")} className="text-green-600 font-semibold cursor-pointer hover:underline">Login</span>
           </p>
         </div>
       </div>

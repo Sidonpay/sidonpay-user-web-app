@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Logo from "../assets/SidonPay Logo.png";
 import SideImage from "../assets/SideImage.png";
 
@@ -7,6 +8,9 @@ const VerifyAccount: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [timer, setTimer] = useState<number>(59);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email || "your email";
 
   // Countdown timer
   useEffect(() => {
@@ -40,6 +44,7 @@ const VerifyAccount: React.FC = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
+      navigate("/kyc/basic-profile");
       console.log("OTP verified:", code);
     }, 2000);
   };
@@ -73,7 +78,7 @@ const VerifyAccount: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-1">Check your email</h2>
           <p className="text-sm text-gray-500 mb-8">
             Please enter the verification code sent to{" "}
-            <span className="font-medium text-gray-700">valerie58@sidonpay.com</span>
+            <span className="font-medium text-gray-700">{email}</span>
           </p>
 
           {/* OTP Inputs */}

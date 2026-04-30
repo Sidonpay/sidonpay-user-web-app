@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, User, Lock } from "lucide-react";
 import Logo from "../assets/SidonPay Logo.png";
 import SideImage from "../assets/SideImage.png";
@@ -26,6 +27,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -48,6 +50,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       setTimeout(() => {
         setIsLoading(false);
         onLogin?.();
+        navigate("/dashboard")
         console.log("Logged in:", formData);
       }, 2000);
     }
@@ -191,7 +194,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           {/* Sign up link */}
           <p className="text-center text-xs text-gray-500 mt-2">
             Don't have an account?{" "}
-            <span className="text-green-600 font-semibold cursor-pointer hover:underline">
+            <span onClick={() => navigate("/signup")} className="text-green-600 font-semibold cursor-pointer hover:underline">
               Sign up
             </span>
           </p>
