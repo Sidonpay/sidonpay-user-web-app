@@ -82,7 +82,7 @@ const SignUp: React.FC = () => {
           <img src={SideImage} alt="Signup illustration" />
             </div>
 
-        {/* Right Side - Form */}
+        {/* Right Side  Form */}
         <div className="w-full md:w-1/2 bg-white p-8 flex flex-col justify-center">
 
           {/* Logo */}

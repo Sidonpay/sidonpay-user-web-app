@@ -89,7 +89,7 @@ const KYCTierOne: React.FC = () => {
       {/* Top Navigation */}
       <div className="flex items-center justify-between mb-10">
 
-        {/* Left - Back Arrow */}
+        {/* Left Arrow */}
         <span
           onClick={() => navigate(-1)}
           className="cursor-pointer text-gray-600 hover:text-gray-800 transition"
@@ -97,7 +97,7 @@ const KYCTierOne: React.FC = () => {
           <ArrowLeft className="w-5 h-5" />
         </span>
 
-        {/* Middle - Step Indicators */}
+        {/* Middle  Step Indicators */}
         <div className="flex gap-2">
           {[1, 2, 3].map((s) => (
             <div
@@ -109,7 +109,7 @@ const KYCTierOne: React.FC = () => {
           ))}
         </div>
 
-        {/* Right - Go to Dashboard */}
+        {/* Right Go to Dashboard */}
         <span
           onClick={() => navigate("/dashboard")}
           className="text-sm text-green-600 cursor-pointer hover:underline font-medium"
