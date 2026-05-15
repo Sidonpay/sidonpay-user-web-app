@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   ChevronDown,
@@ -14,6 +14,7 @@ import {
   LayoutDashboard,
   Menu,
   X,
+  Settings,
 } from "lucide-react";
 import DashboardLogo from "../assets/Dashboard-Logo.png";
 import BreadcrumbIcon from "../assets/breadcrumb-icon.png";
@@ -39,10 +40,10 @@ interface DashboardLayoutProps {
   userName?: string;
   tier?: string;
   notifications?: Notification[];
-  showTeamMembers?: boolean;
+  showSelectBeneficiary?: boolean;
 }
 
-const teamMembers = [
+const selectBeneficiary = [
   { name: "Kunle Adeyeye", avatar: KunleAvatar },
   { name: "Bola Adejo", avatar: BolaAvatar },
   { name: "Shola Adeniyi", avatar: SholaAvatar },
@@ -53,7 +54,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   children,
   userName = "Kolawole",
   tier = "Tier 1",
-  showTeamMembers = false,
+  showSelectBeneficiary = false,
   notifications = [
     { message: "Payment Successful to Fo...", time: "Just now", type: "payment" },
     { message: "New users registered.", time: "59 minutes ago", type: "user" },
@@ -66,6 +67,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const [showMore, setShowMore] = useState<boolean>(false);
   const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
   const [showMobileProfile, setShowMobileProfile] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (
+      location.pathname.startsWith("/help") ||
+      location.pathname === "/settings"
+    ) {
+      setShowMore(true);
+    }
+  }, [location.pathname]);
 
   const navItems = [
     { label: "Overview", icon: <LayoutDashboard className="w-4 h-4" />, path: "/dashboard" },
@@ -88,12 +98,20 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     );
   };
 
+  const isMoreActive =
+    location.pathname.startsWith("/help") ||
+    location.pathname === "/settings";
+
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       <div className="flex-1">
+
+        {/* Logo */}
         <div className="px-4 mb-6">
           <img src={DashboardLogo} alt="SidonPay" className="h-8" />
         </div>
+
+        {/* Nav Items */}
         <nav className="flex flex-col gap-1 px-2">
           {navItems.map((item) => (
             <button
@@ -119,11 +137,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             </button>
           ))}
 
+          {/* More button */}
           <button
             onClick={() => setShowMore(!showMore)}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#2D7A51] hover:bg-green-100 transition w-full"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition w-full ${
+              isMoreActive
+                ? "bg-[#2D7A51] text-white"
+                : "text-[#2D7A51] hover:bg-green-100"
+            }`}
           >
-            <span className="p-1.5 rounded-lg bg-[#2D7A51]">
+            <span className={`p-1.5 rounded-lg ${
+              isMoreActive ? "bg-white bg-opacity-20" : "bg-[#2D7A51]"
+            }`}>
               <Layers className="w-4 h-4 text-white" />
             </span>
             More
@@ -134,17 +159,55 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             )}
           </button>
 
+          {/* More Dropdown */}
           {showMore && (
             <div className="flex flex-col gap-1 pl-2 mt-1">
+
+              {/* Settings */}
               <button
-                onClick={() => navigate("/help")}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#2D7A51] hover:bg-green-100 transition w-full"
+                onClick={() => {
+                  navigate("/settings");
+                  setShowMobileMenu(false);
+                }}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition w-full ${
+                  location.pathname === "/settings"
+                    ? "bg-[#2D7A51] text-white"
+                    : "text-[#2D7A51] hover:bg-green-100"
+                }`}
               >
-                <span className="p-1.5 rounded-lg bg-[#2D7A51]">
+                <span className={`p-1.5 rounded-lg ${
+                  location.pathname === "/settings"
+                    ? "bg-white bg-opacity-20"
+                    : "bg-[#2D7A51]"
+                }`}>
+                  <Settings className="w-4 h-4 text-white" />
+                </span>
+                Settings
+              </button>
+
+              {/* Help Centre */}
+              <button
+                onClick={() => {
+                  navigate("/help");
+                  setShowMobileMenu(false);
+                }}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition w-full ${
+                  location.pathname.startsWith("/help")
+                    ? "bg-[#2D7A51] text-white"
+                    : "text-[#2D7A51] hover:bg-green-100"
+                }`}
+              >
+                <span className={`p-1.5 rounded-lg ${
+                  location.pathname.startsWith("/help")
+                    ? "bg-white bg-opacity-20"
+                    : "bg-[#2D7A51]"
+                }`}>
                   <HelpCircle className="w-4 h-4 text-white" />
                 </span>
                 Help Centre
               </button>
+
+              {/* Logout */}
               <button
                 onClick={() => navigate("/login")}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#2D7A51] hover:bg-green-100 transition w-full"
@@ -192,8 +255,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
         {/* Top Navbar */}
         <div className="w-full bg-white px-4 md:px-6 py-3 flex items-center justify-between border-b border-gray-100 sticky top-0 z-10">
+
+          {/* Left - Hamburger + Breadcrumb */}
           <div className="flex items-center gap-3">
-            <button className="md:hidden" onClick={() => setShowMobileMenu(true)}>
+            <button
+              className="md:hidden"
+              onClick={() => setShowMobileMenu(true)}
+            >
               <Menu className="w-5 h-5 text-gray-600" />
             </button>
             <div className="flex items-center gap-2 text-xs text-gray-400">
@@ -204,6 +272,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             </div>
           </div>
 
+          {/* Search - desktop only */}
           <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 w-72">
             <Search className="w-4 h-4 text-gray-400 shrink-0" />
             <input
@@ -213,13 +282,20 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             />
           </div>
 
+          {/* Right - User Profile */}
           <div className="relative">
             <div
               onClick={() => setShowMobileProfile(!showMobileProfile)}
               className="flex items-center justify-between gap-3 cursor-pointer shrink-0 min-w-[120px] md:min-w-[150px]"
             >
-              <img src={AvatarKolawole} alt="avatar" className="w-8 h-8 rounded-full object-cover" />
-              <span className="text-sm font-medium text-gray-700 flex-1 text-center hidden sm:block">{userName}</span>
+              <img
+                src={AvatarKolawole}
+                alt="avatar"
+                className="w-8 h-8 rounded-full object-cover"
+              />
+              <span className="text-sm font-medium text-gray-700 flex-1 text-center hidden sm:block">
+                {userName}
+              </span>
               {showMobileProfile ? (
                 <ChevronUp className="w-4 h-4 text-gray-400" />
               ) : (
@@ -227,8 +303,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               )}
             </div>
 
+            {/* Mobile Profile Dropdown */}
             {showMobileProfile && (
               <div className="absolute right-0 top-12 w-72 bg-white shadow-xl rounded-xl p-4 z-50 md:hidden flex flex-col gap-4 border border-gray-100">
+
+                {/* Tier Info */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <img src={TierIcon} alt="tier" className="w-6 h-6 shrink-0" />
@@ -237,10 +316,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                       <p className="text-xs text-gray-400 leading-tight">Tier limit stated here</p>
                     </div>
                   </div>
-                  <span onClick={() => navigate("/upgrade")} className="text-xs text-green-600 cursor-pointer hover:underline font-medium shrink-0 ml-2">
+                  <span
+                    onClick={() => navigate("/upgrade")}
+                    className="text-xs text-green-600 cursor-pointer hover:underline font-medium shrink-0 ml-2"
+                  >
                     Upgrade
                   </span>
                 </div>
+
+                {/* Notifications */}
                 <div>
                   <p className="text-sm font-semibold text-gray-700 mb-3">Notifications</p>
                   <div className="flex flex-col gap-3">
@@ -254,10 +338,32 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                       </div>
                     ))}
                   </div>
-                  <p onClick={() => navigate("/notifications")} className="text-xs text-gray-700 cursor-pointer underline mt-3 font-medium">
+                  <p
+                    onClick={() => navigate("/notifications")}
+                    className="text-xs text-gray-700 cursor-pointer underline mt-3 font-medium"
+                  >
                     All Notifications
                   </p>
                 </div>
+
+                {/* Team Members - mobile */}
+                {showSelectBeneficiary && (
+                  <div>
+                    <p className="text-sm font-semibold text-gray-700 mb-3">Select Beneficiary</p>
+                    <div className="flex flex-col gap-3">
+                      {selectBeneficiary.map((member, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <img
+                            src={member.avatar}
+                            alt={member.name}
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                          <p className="text-xs text-gray-600 font-medium">{member.name}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -265,11 +371,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
         {/* Body */}
         <div className="flex flex-1">
+
+          {/* Main Content */}
           <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-white">
             {children}
           </div>
 
-          {/* Right Sidebar */}
+          {/* Right Sidebar - desktop only */}
           <div className="hidden md:flex w-64 bg-white border-l border-gray-100 p-4 flex-col gap-4 shrink-0">
 
             {/* Tier Info */}
@@ -281,7 +389,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   <p className="text-xs text-gray-400 leading-tight">Tier limit stated here</p>
                 </div>
               </div>
-              <span onClick={() => navigate("/upgrade")} className="text-xs text-green-600 cursor-pointer hover:underline font-medium shrink-0 ml-2">
+              <span
+                onClick={() => navigate("/upgrade")}
+                className="text-xs text-green-600 cursor-pointer hover:underline font-medium shrink-0 ml-2"
+              >
                 Upgrade
               </span>
             </div>
@@ -300,19 +411,26 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   </div>
                 ))}
               </div>
-              <p onClick={() => navigate("/notifications")} className="text-xs text-gray-700 cursor-pointer underline mt-3 font-medium">
+              <p
+                onClick={() => navigate("/notifications")}
+                className="text-xs text-gray-700 cursor-pointer underline mt-3 font-medium"
+              >
                 All Notifications
               </p>
             </div>
 
-            {/* Team Members only on transfer page step 1 */}
-            {showTeamMembers && (
+            {/* Team Members - desktop only on Transfer Sidonpay */}
+            {showSelectBeneficiary && (
               <div>
-                <p className="text-sm font-semibold text-gray-700 mb-3">Team members</p>
+                <p className="text-sm font-semibold text-green-700 mb-3">Select Beneficiary</p>
                 <div className="flex flex-col gap-3">
-                  {teamMembers.map((member, index) => (
+                  {selectBeneficiary.map((member, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full object-cover" />
+                      <img
+                        src={member.avatar}
+                        alt={member.name}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
                       <p className="text-xs text-gray-600 font-medium">{member.name}</p>
                     </div>
                   ))}
@@ -326,4 +444,4 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   );
 };
 
-export default DashboardLayout
+export default DashboardLayout;

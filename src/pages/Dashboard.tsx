@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, ArrowDown, ArrowUp } from "lucide-react";
+import { Eye, EyeOff, ArrowDown, ArrowUp, MessageCircle } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import FlagNGN from "../assets/flag-ngn.png";
 import FlagUSD from "../assets/flag-usd.png";
@@ -9,6 +9,7 @@ import IconSendMoney from "../assets/icon-send-money.png";
 import IconConvert from "../assets/icon-convert.png";
 import IconPayBills from "../assets/icon-pay-bills.png";
 import IconNGNtoUSD from "../assets/ngn-usd-icon.png";
+import AiAssistant from "../components/AiAssistant";
 
 interface Transaction {
   id: number;
@@ -71,6 +72,7 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [showNGN, setShowNGN] = useState<boolean>(true);
   const [showUSD, setShowUSD] = useState<boolean>(true);
+  const [showAi, setShowAi] = useState<boolean>(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -228,6 +230,13 @@ const Dashboard: React.FC = () => {
             </div>
           ))}
         </div>
+        <button
+          onClick={() => setShowAi(true)}
+          className="fixed bottom-6 right-6 w-12 h-12 bg-[#2D7A51] rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition z-40"
+        >
+          <MessageCircle className="w-5 h-5 text-white" />
+        </button>
+        {showAi && <AiAssistant onClose={() => setShowAi(false)} />}
       </div>
     </DashboardLayout>
   );

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Logo from "../assets/SidonPay Logo.png";
 import SideImage from "../assets/SideImage.png";
 import {Eye, EyeOff, User, Mail, Phone, Lock} from "lucide-react";
+// import OnboardingCarousel from "../components/OnboardingCarousel";
 
 interface FormData {
   fullName: string;
@@ -276,4 +277,4 @@ const SignUp: React.FC = () => {
   );
 };
 
-export default SignUp; 
+export default SignUp;

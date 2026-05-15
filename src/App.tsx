@@ -8,13 +8,18 @@ import KYCBasicProfile from "./pages/KYCBasicProfile";
 import KYCTierOne from "./pages/KYCTierOne";
 import Dashboard from "./pages/Dashboard";
 import Transfer from "./pages/Transfer";
+import HelpCentre from "./pages/HelpCentre";
+import HelpCategories from "./pages/HelpCategories";
+import HelpCategoryDetail from "./pages/HelpCategoryDetail";
+import LiveChat from "./pages/LiveChat";
+import ReportProblem from "./pages/ReportProblem";
+import SendMail from "./pages/SendMail";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   const handleLogin = () => setIsLoggedIn(true);
   const handleLogout = () => setIsLoggedIn(false);
 
@@ -27,16 +32,14 @@ const App: React.FC = () => {
         <Route path="/verify-account" element={<VerifyAccount />} />
         <Route path="/kyc/basic-profile" element={<KYCBasicProfile />} />
         <Route path="/kyc/tier-one" element={<KYCTierOne />} />
-        <Route path="/dashboard" element={
-          <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <Dashboard />
-          </ProtectedRoute>
-        } />
-        <Route path="/transfer" element={
-          <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <Transfer />
-          </ProtectedRoute>
-        } />
+        <Route path="/dashboard" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Dashboard /></ProtectedRoute>} />
+        <Route path="/transfer" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Transfer /></ProtectedRoute>} />
+        <Route path="/help" element={<ProtectedRoute isLoggedIn={isLoggedIn}><HelpCentre /></ProtectedRoute>} />
+        <Route path="/help/categories" element={<ProtectedRoute isLoggedIn={isLoggedIn}><HelpCategories /></ProtectedRoute>} />
+        <Route path="/help/categories/:id" element={<ProtectedRoute isLoggedIn={isLoggedIn}><HelpCategoryDetail /></ProtectedRoute>} />
+        <Route path="/help/live-chat" element={<ProtectedRoute isLoggedIn={isLoggedIn}><LiveChat /></ProtectedRoute>} />
+        <Route path="/help/report" element={<ProtectedRoute isLoggedIn={isLoggedIn}><ReportProblem /></ProtectedRoute>} />
+        <Route path="/help/send-mail" element={<ProtectedRoute isLoggedIn={isLoggedIn}><SendMail /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

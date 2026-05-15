@@ -4,7 +4,7 @@ import ThumbsUpIcon from "../assets/thumbs-up-icon.png";
 import SadFaceIcon from "../assets/sad-face-icon.png";
 
 type Step = "recipient" | "amount";
-type ModalType = "success" | "failed" | null;
+type ModalType = "success" | "failed" | "cooldown" | null;
 
 interface FormData {
   recipientAccount: string;
@@ -16,13 +16,21 @@ interface TransferSidonpayProps {
   onStepChange: (step: Step) => void;
 }
 
-const quickAmounts = ["₦1,000", "₦2,000", "₦5,000", "₦10,000", "₦50,000"];
+const quickAmounts = [
+  { label: "₦1,000", value: "1000" },
+  { label: "₦2,000", value: "2000" },
+  { label: "₦5,000", value: "5000" },
+  { label: "₦10,000", value: "10000" },
+  { label: "₦50,000", value: "50000" },
+];
 
 const mockUsers: Record<string, string> = {
   "0123456789": "Pauline Jackson",
   "0987654321": "John Adewale",
   "0111222333": "Mary Johnson",
   "0123455555": "Samuel Peters",
+  "0198765432": "Grace Okafor",
+  "0123456780": "David Nwosu",
 };
 
 const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => {
@@ -37,12 +45,12 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
   const [amountError, setAmountError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [modal, setModal] = useState<ModalType>(null);
+  const [failCount, setFailCount] = useState<number>(0);
 
   const verifyAccount = (value: string) => {
     setFormData((prev) => ({ ...prev, recipientAccount: value }));
     setRecipientError("");
     setRecipientName("");
-
     if (value.length === 10) {
       setTimeout(() => {
         const found = mockUsers[value];
@@ -73,8 +81,7 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
     onStepChange("recipient");
   };
 
-  const handleQuickAmount = (amount: string) => {
-    const value = amount.replace("₦", "").replace(",", "");
+  const handleQuickAmount = (value: string) => {
     setFormData((prev) => ({ ...prev, amount: value }));
     setAmountError("");
   };
@@ -97,8 +104,26 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
     setTimeout(() => {
       setIsLoading(false);
       const isSuccess = Math.random() > 0.3;
-      setModal(isSuccess ? "success" : "failed");
+      if (isSuccess) {
+        setFailCount(0);
+        setModal("success");
+      } else {
+        const newFailCount = failCount + 1;
+        setFailCount(newFailCount);
+        if (newFailCount >= 3) {
+          setModal("cooldown");
+        } else {
+          setModal("failed");
+        }
+      }
     }, 2000);
+  };
+
+  const handleTryAgain = () => {
+    // Go back to amount step NOT recipient step
+    setModal(null);
+    setFormData((prev) => ({ ...prev, amount: "", note: "" }));
+    setAmountError("");
   };
 
   const handleReset = () => {
@@ -109,6 +134,7 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
     setRecipientError("");
     setAmountError("");
     setModal(null);
+    setFailCount(0);
   };
 
   return (
@@ -142,8 +168,11 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
               Something went wrong. Please check your network and try again
             </p>
             <img src={SadFaceIcon} alt="failed" className="w-16 h-16 mx-auto mb-6" />
+            <p className="text-xs text-gray-400 mb-4">
+              Attempt {failCount} of 3
+            </p>
             <button
-              onClick={handleReset}
+              onClick={handleTryAgain}
               className="w-full bg-[#2D7A51] text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition"
             >
               Try Again
@@ -152,7 +181,27 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
         </div>
       )}
 
-      {/* Step 1  Recipient */}
+      {/* Cooldown Modal - after 3 failed attempts */}
+      {modal === "cooldown" && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
+            <h3 className="text-lg font-bold text-gray-800 mb-2">Transaction failed</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              You have exceeded the maximum number of attempts.
+              Please try again after <span className="font-bold text-red-500">15 minutes</span>.
+            </p>
+            <img src={SadFaceIcon} alt="failed" className="w-16 h-16 mx-auto mb-6" />
+            <button
+              onClick={handleReset}
+              className="w-full bg-[#2D7A51] text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition"
+            >
+              Back to Transfer
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 1 - Recipient */}
       {step === "recipient" && (
         <div className="flex flex-col gap-4">
           <div>
@@ -194,17 +243,16 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 Please wait...
               </>
-            ) : (
-              "Continue"
-            )}
+            ) : "Continue"}
           </button>
         </div>
       )}
 
-      {/* Step 2  Amount */}
+      {/* Step 2 - Amount */}
       {step === "amount" && (
         <div className="flex flex-col gap-4">
 
+          {/* Back Arrow */}
           <button
             onClick={handleBack}
             className="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition w-fit"
@@ -228,9 +276,7 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
 
           {/* Amount */}
           <div>
-            <label className="text-xs font-medium text-gray-600 mb-1 block">
-              Amount
-            </label>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Amount</label>
             <div className={`flex items-center border rounded-lg px-4 py-2.5 bg-gray-50 ${
               amountError ? "border-red-500 bg-red-50" : "border-gray-200"
             }`}>
@@ -255,20 +301,22 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
           <div className="flex flex-wrap gap-2">
             {quickAmounts.map((amount) => (
               <button
-                key={amount}
-                onClick={() => handleQuickAmount(amount)}
-                className="text-xs border border-gray-200 rounded-lg px-3 py-1.5 text-gray-500 hover:bg-green-50 hover:border-green-400 hover:text-green-600 transition"
+                key={amount.value}
+                onClick={() => handleQuickAmount(amount.value)}
+                className={`text-xs border rounded-lg px-3 py-1.5 transition font-medium ${
+                  formData.amount === amount.value
+                    ? "bg-[#2D7A51] text-white border-[#2D7A51]"
+                    : "border-gray-200 text-gray-500 hover:bg-green-50 hover:border-green-400 hover:text-green-600"
+                }`}
               >
-                {amount}
+                {amount.label}
               </button>
             ))}
           </div>
 
           {/* Note */}
           <div>
-            <label className="text-xs font-medium text-gray-600 mb-1 block">
-              Note
-            </label>
+            <label className="text-xs font-medium text-gray-600 mb-1 block">Note</label>
             <input
               type="text"
               placeholder="What's this for? (Optional)"
@@ -295,9 +343,7 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 Please wait...
               </>
-            ) : (
-              "Continue"
-            )}
+            ) : "Continue"}
           </button>
         </div>
       )}
