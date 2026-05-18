@@ -170,7 +170,7 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ onClose }) => {
               I can help with transactions, balances, security, and more. How can i be of help?
             </p>
 
-            {/* Quick replies 2x2 grid */}
+            {/* Quick replies */}
             <div className="grid grid-cols-2 gap-2 w-full mb-3">
               {quickReplies.map((reply) => (
                 <button
@@ -184,7 +184,7 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ onClose }) => {
               ))}
             </div>
 
-            {/* Chat with live agent - full width */}
+            {/* Chat with live agent */}
             <button
               onClick={() => handleQuickReply("Chat with a live agent")}
               className="flex items-center justify-center gap-2 w-full px-3 py-3 bg-gray-50 rounded-xl text-sm text-gray-700 hover:bg-green-50 hover:text-[#2D7A51] transition"

@@ -13,6 +13,7 @@ import {
   Layers,
   LayoutDashboard,
   Menu,
+  UserCircle,
   X,
   Settings,
 } from "lucide-react";
@@ -82,6 +83,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     { label: "Transfer Money", icon: <ArrowLeftRight className="w-4 h-4" />, path: "/transfer" },
     { label: "Bill Payments", icon: <Receipt className="w-4 h-4" />, path: "/bill-payments" },
     { label: "Gift Cards", icon: <Gift className="w-4 h-4" />, path: "/gift-cards" },
+    { label: "Account", icon: <UserCircle size={18} />, path: "/dashboard/account" },
     { label: "Virtual Cards", icon: <CreditCard className="w-4 h-4" />, path: "/virtual-cards" },
     { label: "Multi-Currency Cards", icon: <Layers className="w-4 h-4" />, path: "/multi-currency" },
   ];

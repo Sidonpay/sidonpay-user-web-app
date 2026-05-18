@@ -102,4 +102,4 @@ const SetupPin: React.FC = () => {
   );
 };
 
-export default SetupPin
+export default SetupPin;

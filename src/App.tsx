@@ -17,6 +17,10 @@ import SendMail from "./pages/SendMail";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
+import AccountPage from "./pages/AccountPage";
+import ChangeEmailPage from "./pages/ChangeEmailPage";
+import SetupPinPage from "./pages/SetupPinPage";
+
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -32,6 +36,9 @@ const App: React.FC = () => {
         <Route path="/verify-account" element={<VerifyAccount />} />
         <Route path="/kyc/basic-profile" element={<KYCBasicProfile />} />
         <Route path="/kyc/tier-one" element={<KYCTierOne />} />
+        <Route path="/dashboard/account" element={<ProtectedRoute isLoggedIn={isLoggedIn}><AccountPage/></ProtectedRoute>}/>
+        <Route path="/dashboard/account/change-email" element={<ProtectedRoute isLoggedIn={isLoggedIn}><ChangeEmailPage/></ProtectedRoute>} />
+        <Route path="/dashboard/account/setup-pin" element={<ProtectedRoute isLoggedIn={isLoggedIn}><SetupPinPage/></ProtectedRoute>}/>
         <Route path="/dashboard" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Dashboard /></ProtectedRoute>} />
         <Route path="/transfer" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Transfer /></ProtectedRoute>} />
         <Route path="/help" element={<ProtectedRoute isLoggedIn={isLoggedIn}><HelpCentre /></ProtectedRoute>} />
