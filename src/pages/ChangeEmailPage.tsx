@@ -11,8 +11,6 @@ type Method = "sms" | "email";
 const ChangeEmailPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Real email passed from PersonalInfoTab
   const currentEmail = location.state?.currentEmail || "";
 
   const [selectedMethod, setSelectedMethod] = useState<Method | null>(null);
@@ -26,7 +24,6 @@ const ChangeEmailPage = () => {
 
   const handleVerified = () => {
     setShowModal(false);
-    // Go back to account page, email field auto-opens
     navigate("/dashboard/account", { state: { emailVerified: true } });
   };
 

@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AiAssistant from "../components/AiAssistant";
+import { MessageCircle } from "lucide-react";
+
 
 const Toggle = ({
   enabled,
@@ -66,6 +69,7 @@ const Row = ({ title, subtitle, right, highlight = false, onClick }: RowProps) =
   const [emailNotif, setEmailNotif] = useState(true);
   const [smsNotif, setSmsNotif] = useState(false);
   const [activeRow, setActiveRow] = useState<string>("pin");
+  const [showAi, setShowAi] = useState<boolean>(false);
 
   return (
     <div className="flex flex-col gap-6">
@@ -152,8 +156,18 @@ const Row = ({ title, subtitle, right, highlight = false, onClick }: RowProps) =
           onClick={() => setActiveRow("sms")}
         />
       </div>
+      <button
+          onClick={() => setShowAi(true)}
+          className="fixed bottom-6 right-6 w-12 h-12 bg-[#2D7A51] rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition z-40"
+        >
+          <MessageCircle className="w-5 h-5 text-white" />
+        </button>
 
-    </div>
+        {/* AI Assistant overlay */}
+        {showAi && <AiAssistant onClose={() => setShowAi(false)} />}
+      </div>
+    // </div>
+    
   );
 };
 

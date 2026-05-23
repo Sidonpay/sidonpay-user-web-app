@@ -36,7 +36,7 @@ const SetupPinPage = () => {
     const code = pin.join("");
     if (code.length < PIN_LENGTH) return;
 
-    // 🔁 Replace with real API call to save PIN
+    
     localStorage.setItem("pinActivated", "true");
     navigate("/dashboard/account", { state: { activeTab: "security" } });
   };

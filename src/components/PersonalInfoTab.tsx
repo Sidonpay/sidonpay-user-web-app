@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { useRef, useEffect } from "react";
+import { useUser } from "../context/UserContext";
 import ProfileFeedbackModal from "./ProfileFeedbackModal";
 import emailLockIcon from "../assets/email-icon.png";
+import DatePicker from "./DatePicker";
 
 const countries = [
   { name: "Nigeria", code: "NG", dial: "+234", flag: "🇳🇬" },
@@ -49,6 +51,7 @@ interface FormState {
   lastName: string;
   email: string;
   phoneNumber: string;
+  dateOfBirth: string;
 }
 
 interface EditingState {
@@ -56,6 +59,7 @@ interface EditingState {
   lastName: boolean;
   email: boolean;
   phoneNumber: boolean;
+  dateOfBirth: boolean;
 }
 
 interface ErrorState {
@@ -63,6 +67,7 @@ interface ErrorState {
   lastName: string;
   email: string;
   phoneNumber: string;
+  dateOfBirth: string;
 }
 
 // Validation
@@ -73,6 +78,7 @@ const validate = (form: FormState): ErrorState => {
     lastName: "",
     email: "",
     phoneNumber: "",
+    dateOfBirth: "",
   };
 
   if (!form.firstName.trim()) e.firstName = "This field can't be empty.";
@@ -94,7 +100,7 @@ const validate = (form: FormState): ErrorState => {
 
 const hasErrors = (e: ErrorState) => Object.values(e).some((v) => v !== "");
 
-// Country dropdown
+// Country Dropdown
 
 const CountryDropdown = ({
   selected,
@@ -223,12 +229,14 @@ const Field = ({
 
 const PersonalInfoTab = ({ emailVerified = false }: Props) => {
   const navigate = useNavigate();
+  const { updateProfile } = useUser();
 
   const [form, setForm] = useState<FormState>({
     firstName: "",
     lastName: "",
     email: "",
     phoneNumber: "",
+    dateOfBirth: "",
   });
 
   const [editing, setEditing] = useState<EditingState>({
@@ -236,6 +244,7 @@ const PersonalInfoTab = ({ emailVerified = false }: Props) => {
     lastName: false,
     email: emailVerified,
     phoneNumber: false,
+    dateOfBirth: false,
   });
 
   const [errors, setErrors] = useState<ErrorState>({
@@ -243,6 +252,7 @@ const PersonalInfoTab = ({ emailVerified = false }: Props) => {
     lastName: "",
     email: "",
     phoneNumber: "",
+    dateOfBirth: "",
   });
 
   const [selectedCountry, setSelectedCountry] = useState<Country>(countries[0]);
@@ -268,11 +278,19 @@ const PersonalInfoTab = ({ emailVerified = false }: Props) => {
     setIsSaving(true);
     try {
       await new Promise<void>((resolve) => setTimeout(resolve, 1200));
+      updateProfile({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phoneNumber: form.phoneNumber,
+        dateOfBirth: form.dateOfBirth,
+      });
       setEditing({
         firstName: false,
         lastName: false,
         email: false,
         phoneNumber: false,
+        dateOfBirth: false,
       });
       setModal("success");
     } catch {
@@ -350,16 +368,28 @@ const PersonalInfoTab = ({ emailVerified = false }: Props) => {
           )}
         </div>
 
+        {/* Date of Birth */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-gray-500 font-medium">
+            Date of Birth
+          </label>
+          <DatePicker
+            value={form.dateOfBirth}
+            isEditing={editing.dateOfBirth}
+            onEdit={() => handleEdit("dateOfBirth")}
+            onChange={(date) => {
+              handleChange("dateOfBirth", date);
+              setEditing((prev) => ({ ...prev, dateOfBirth: false }));
+            }}
+          />
+        </div>
+
         {/* Email */}
         <Field
           label={
             <span className="flex items-center gap-1">
               Email address
-              <img
-                src={emailLockIcon}
-                alt="locked"
-                className="h-3.5 w-auto"
-              />
+              <img src={emailLockIcon} alt="locked" className="h-3.5 w-auto" />
             </span>
           }
           placeholder="Enter email address"
@@ -368,17 +398,17 @@ const PersonalInfoTab = ({ emailVerified = false }: Props) => {
           error={errors.email}
           buttonLabel="Change"
           type="email"
-          onEdit={() => navigate("/dashboard/account/change-email", {
-            state: {currentEmail: form.email}
-          })}
+          onEdit={() =>
+            navigate("/dashboard/account/change-email", {
+              state: { currentEmail: form.email },
+            })
+          }
           onChange={(v) => handleChange("email", v)}
         />
 
         {/* KYC Status */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs text-gray-500 font-medium">
-            KYC Status
-          </label>
+          <label className="text-xs text-gray-500 font-medium">KYC Status</label>
           <div className="w-full border border-gray-200 bg-white rounded-xl px-4 py-3">
             <span className="text-sm text-amber-400 font-medium">Pending</span>
           </div>

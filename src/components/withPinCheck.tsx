@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import PinSetupModal from "../pages/PinSetupModal";
+import PinSetupModal from "../pages/PinSetupmodal";
 import { usePinSetup } from "../hooks/usePinSetup";
 
 interface WithPinCheckProps {

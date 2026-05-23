@@ -92,7 +92,7 @@ const VerifyEmailModal = ({ onClose, onVerified, currentEmail }: Props) => {
           <X size={20} />
         </button>
 
-        {/* ── Step: confirm ── */}
+        {/*  Step: confirm  */}
         {(step === "confirm" || step === "sending") && (
           <div className="flex flex-col items-center gap-4 text-center">
             <h2 className="text-xl font-bold text-gray-900">
@@ -120,7 +120,7 @@ const VerifyEmailModal = ({ onClose, onVerified, currentEmail }: Props) => {
           </div>
         )}
 
-        {/* ── Step: OTP entry ── */}
+        {/*Step: OTP entry*/}
         {step === "otp" && (
           <div className="flex flex-col items-center gap-5 text-center">
             <h2 className="text-xl font-bold text-gray-900">
