@@ -3,11 +3,32 @@ import type { KYCDocument } from "../components/KYCTab";
 
 interface Props {
   documents: KYCDocument[];
+  tierTarget: "tier1" | "tier2" | "all";
   onSelect: (doc: KYCDocument) => void;
   onClose: () => void;
 }
 
-const VerifyDocumentsModal = ({ documents, onSelect, onClose }: Props) => {
+const VerifyDocumentsModal = ({
+  documents,
+  tierTarget,
+  onSelect,
+  onClose,
+}: Props) => {
+
+  // Filter docs based on tier
+  const visibleDocs = documents.filter((d) => {
+    if (tierTarget === "tier1") return d.id === "bvn" || d.id === "id";
+    if (tierTarget === "tier2") return d.id === "utility" || d.id === "address";
+    return true;
+  });
+
+  const title =
+    tierTarget === "tier1"
+      ? "Upgrade to Tier 1"
+      : tierTarget === "tier2"
+      ? "Upgrade to Tier 2"
+      : "Continue Verification";
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm px-4"
@@ -26,31 +47,31 @@ const VerifyDocumentsModal = ({ documents, onSelect, onClose }: Props) => {
         </button>
 
         {/* Header */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-[#e8f5ee] flex items-center justify-center">
-            <FileText size={20} className="text-[#1a6b3c]" />
+        <div className="flex items-center gap-3 mb-6 pb-5 border-b border-gray-100">
+          <div className="w-12 h-12 rounded-xl bg-[#e8f5ee] flex items-center justify-center shrink-0">
+            <FileText size={22} className="text-[#1a6b3c]" />
           </div>
           <div>
-            <p className="text-base font-bold text-gray-900">Verify Documents</p>
-            <p className="text-xs text-gray-400">Select a document to continue</p>
+            <p className="text-lg font-bold text-gray-900">{title}</p>
+            <p className="text-sm text-gray-400">Select a document to continue</p>
           </div>
         </div>
 
         {/* Document list */}
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
           Required Documents
         </p>
 
-        <div className="flex flex-col gap-1">
-          {documents.map((doc) => (
+        <div className="flex flex-col divide-y divide-gray-100">
+          {visibleDocs.map((doc) => (
             <button
               key={doc.id}
               onClick={() => onSelect(doc)}
-              className="flex items-center justify-between w-full px-4 py-3.5 rounded-xl hover:bg-gray-50 transition-colors text-left border border-transparent hover:border-gray-100"
+              className="flex items-center justify-between w-full py-4 px-2 text-left hover:bg-gray-50 transition-colors rounded-xl"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center shrink-0">
-                  <FileText size={16} className="text-gray-400" />
+                <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
+                  <FileText size={18} className="text-gray-400" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">{doc.name}</p>

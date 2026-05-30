@@ -208,7 +208,7 @@ const TransferLocalBank: React.FC<TransferLocalBankProps> = ({ onStepChange }) =
   };
       
    const handleTryAgain = () => {
-    // Go back to amount step NOT recipient step
+    // Back to the amount step
     setModal(null);
     setFormData((prev) => ({ ...prev, amount: "", note: "" }));
     setAmountError("");
@@ -288,7 +288,7 @@ const TransferLocalBank: React.FC<TransferLocalBankProps> = ({ onStepChange }) =
       )}
 
 
-      {/* Step 1 - Recipient */}
+      {/* Step 1 Recipient */}
       {step === "recipient" && (
         <div className="flex flex-col gap-4">
 

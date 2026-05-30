@@ -120,7 +120,6 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
   };
 
   const handleTryAgain = () => {
-    // Go back to amount step NOT recipient step
     setModal(null);
     setFormData((prev) => ({ ...prev, amount: "", note: "" }));
     setAmountError("");
@@ -181,7 +180,7 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
         </div>
       )}
 
-      {/* Cooldown Modal - after 3 failed attempts */}
+      {/* Cooldown Modal after 3 failed attempts */}
       {modal === "cooldown" && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
@@ -201,7 +200,7 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
         </div>
       )}
 
-      {/* Step 1 - Recipient */}
+      {/* Step 1 Recipient */}
       {step === "recipient" && (
         <div className="flex flex-col gap-4">
           <div>
@@ -248,7 +247,7 @@ const TransferSidonpay: React.FC<TransferSidonpayProps> = ({ onStepChange }) => 
         </div>
       )}
 
-      {/* Step 2 - Amount */}
+      {/* Step 2 Amount */}
       {step === "amount" && (
         <div className="flex flex-col gap-4">
 

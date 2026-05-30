@@ -90,7 +90,7 @@ const TierUpgradeModal = ({ document, onClose, onSubmitted }: Props) => {
 
     setIsSubmitting(true);
 
-    // 🔁 Replace with real API call
+    // will Replace with real API call
     await new Promise((r) => setTimeout(r, 1500));
     setIsSubmitting(false);
 
@@ -115,15 +115,12 @@ const TierUpgradeModal = ({ document, onClose, onSubmitted }: Props) => {
         className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
         >
           <X size={20} />
         </button>
-
-        {/* Header — export SidonPay icon from Figma */}
         <div className="flex flex-col gap-1 mb-5">
           <div className="w-12 h-12 rounded-xl bg-[#1a6b3c] flex items-center justify-center mb-2">
             <span className="text-white text-xl font-bold">S</span>
