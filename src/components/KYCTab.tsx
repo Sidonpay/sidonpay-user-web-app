@@ -250,7 +250,7 @@ const KYCTab = () => {
     <>
       <div className="flex flex-col divide-y divide-gray-100">
 
-        {/* ── Section 1: KYC Overview ── */}
+        {/* Section 1 KYC Overview */}
         <div className="py-6">
           <div className="flex items-start justify-between mb-5">
             <div className="flex items-center gap-3">
