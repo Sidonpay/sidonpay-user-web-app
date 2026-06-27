@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import Logo from "../assets/LandingLogo.png";
+import Logo from "../assets/Dashboard-Logo.png";
 import {  Menu, X } from "lucide-react";
 
 const Navsection = () => {
@@ -21,7 +21,7 @@ const Navsection = () => {
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-1.5">
-            <img src={Logo} alt="SidonPay" className="h-10"/>
+            <img src={Logo} alt="SidonPay" className="h-15"/>
           </Link>
 
           {/* Desktop center links */}

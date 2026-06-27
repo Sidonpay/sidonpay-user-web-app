@@ -42,6 +42,8 @@ interface DashboardLayoutProps {
   tier?: string;
   notifications?: Notification[];
   showSelectBeneficiary?: boolean;
+  breadcrumbParent?: string;
+  breadcrumbCurrent?: string;
 }
 
 const selectBeneficiary = [
@@ -56,6 +58,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   userName = "Kolawole",
   tier = "Tier 1",
   showSelectBeneficiary = false,
+  breadcrumbParent = "Dashboards",
+  breadcrumbCurrent = "Home",
   notifications = [
     { message: "Payment Successful to Fo...", time: "Just now", type: "payment" },
     { message: "New users registered.", time: "59 minutes ago", type: "user" },
@@ -266,13 +270,21 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             >
               <Menu className="w-5 h-5 text-gray-600" />
             </button>
-            <div className="flex items-center gap-2 text-xs text-gray-400">
+            {/* <div className="flex items-center gap-2 text-xs text-gray-400">
               <img src={BreadcrumbIcon} alt="dashboard" className="w-5 h-5" />
               <span className="hidden sm:block">Dashboards</span>
               <span className="hidden sm:block">/</span>
               <span className="text-gray-800 font-bold">Home</span>
             </div>
-          </div>
+          </div> */}
+
+           <div className="flex items-center gap-2 text-xs text-gray-400">
+          <img src={BreadcrumbIcon} alt="dashboard" className="w-5 h-5" />
+          <span className="hidden sm:block">{breadcrumbParent}</span>
+          <span className="hidden sm:block">/</span>
+          <span className="text-gray-800 font-bold">{breadcrumbCurrent}</span>
+        </div>
+        </div>
 
           {/* Search - desktop only */}
           <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 w-72">

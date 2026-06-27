@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Logo from "../assets/LandingLogo.png";
+import Logo from "../assets/Dashboard-Logo.png";
 
 const Footer = () => {
   return (
@@ -9,7 +9,7 @@ const Footer = () => {
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-1.5 flex-shrink-0">
-            <img src={Logo} alt="SidonPay" className="h-10" />
+            <img src={Logo} alt="SidonPay" className="h-15" />
           </Link>
 
           {/* Links */}
