@@ -75,7 +75,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
   useEffect(() => {
     if (
-      location.pathname.startsWith("/help") ||
+      location.pathname.startsWith("/dashboard/help") ||
       location.pathname === "/settings"
     ) {
       setShowMore(true);
@@ -105,7 +105,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   };
 
   const isMoreActive =
-    location.pathname.startsWith("/help") ||
+    location.pathname.startsWith("dashboard/help") ||
     location.pathname === "/settings";
 
   const SidebarContent = () => (
@@ -194,17 +194,17 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               {/* Help Centre */}
               <button
                 onClick={() => {
-                  navigate("/help");
+                  navigate("/dashboard/help");
                   setShowMobileMenu(false);
                 }}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition w-full ${
-                  location.pathname.startsWith("/help")
+                  location.pathname.startsWith("/dashboard/help")
                     ? "bg-[#2D7A51] text-white"
                     : "text-[#2D7A51] hover:bg-green-100"
                 }`}
               >
                 <span className={`p-1.5 rounded-lg ${
-                  location.pathname.startsWith("/help")
+                  location.pathname.startsWith("/dashboard/help")
                     ? "bg-white bg-opacity-20"
                     : "bg-[#2D7A51]"
                 }`}>
