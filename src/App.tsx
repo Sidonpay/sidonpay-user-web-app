@@ -24,6 +24,14 @@ import ChangeEmailPage from "./pages/ChangeEmailPage";
 import SetupPinPage from "./pages/SetupPinPage";
 import UsdWalletPage from "./pages/UsdWalletPage";
 import NgnWalletPage from "./pages/NgnWalletPage";
+import AddMoneyPage from "./pages/AddMoneyPage";
+import ManageCardsPage from "./pages/ManageCardsPage";
+import AddCardPage from "./pages/AddCardPage";
+import CardFundingPage from "./pages/CardFundingPage";
+import CardReceiptPage from "./pages/CardReceiptPage";
+import { WalletProvider } from "./context/WalletContext";
+import BankTransferPage from "./pages/BankTransferPage";
+import UssdPaymentPage from "./pages/UssdPaymentPage";
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -32,6 +40,7 @@ const App: React.FC = () => {
 
   return (
     <Router>
+      <WalletProvider>
       <Routes>
         {/* Public marketing pages */}
         <Route path="/" element={<Landing />} />
@@ -46,16 +55,29 @@ const App: React.FC = () => {
         <Route path="/kyc/basic-profile" element={<KYCBasicProfile />} />
         <Route path="/kyc/tier-one" element={<KYCTierOne />} />
 
-        {/* Dashboard (protected) */}
+        {/* Dashboard */}
         <Route path="/dashboard" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Dashboard /></ProtectedRoute>} />
         <Route path="/dashboard/account" element={<ProtectedRoute isLoggedIn={isLoggedIn}><AccountPage /></ProtectedRoute>} />
         <Route path="/dashboard/account/change-email" element={<ProtectedRoute isLoggedIn={isLoggedIn}><ChangeEmailPage /></ProtectedRoute>} />
         <Route path="/dashboard/account/setup-pin" element={<ProtectedRoute isLoggedIn={isLoggedIn}><SetupPinPage /></ProtectedRoute>} />
-        <Route path="/usd-wallet" element={<ProtectedRoute isLoggedIn={isLoggedIn}><UsdWalletPage /></ProtectedRoute>} />
-        <Route path="/ngn-wallet" element={<ProtectedRoute isLoggedIn={isLoggedIn}><NgnWalletPage /></ProtectedRoute>} />
         <Route path="/transfer" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Transfer /></ProtectedRoute>} />
 
-        {/* Dashboard Help (protected) — separate from public /help */}
+        {/* Wallets */}
+        <Route path="/ngn-wallet" element={<ProtectedRoute isLoggedIn={isLoggedIn}><NgnWalletPage /></ProtectedRoute>} />
+        <Route path="/usd-wallet" element={<ProtectedRoute isLoggedIn={isLoggedIn}><UsdWalletPage /></ProtectedRoute>} />
+
+        {/* Add Money — NGN only for now */}
+        <Route path="/add-money" element={<ProtectedRoute isLoggedIn={isLoggedIn}><AddMoneyPage /></ProtectedRoute>} />
+        <Route path="/card-funding" element={<ProtectedRoute isLoggedIn={isLoggedIn}><CardFundingPage /></ProtectedRoute>} />
+        <Route path="/card-receipt" element={<ProtectedRoute isLoggedIn={isLoggedIn}><CardReceiptPage /></ProtectedRoute>} />
+        <Route path="/bank-transfer" element={<ProtectedRoute isLoggedIn={isLoggedIn}><BankTransferPage/></ProtectedRoute>} />
+        <Route path="/add-money/ussd" element={<ProtectedRoute isLoggedIn={isLoggedIn}><UssdPaymentPage/></ProtectedRoute>} />
+
+        {/* Card Management */}
+        <Route path="/manage-cards" element={<ProtectedRoute isLoggedIn={isLoggedIn}><ManageCardsPage /></ProtectedRoute>} />
+        <Route path="/add-card" element={<ProtectedRoute isLoggedIn={isLoggedIn}><AddCardPage /></ProtectedRoute>} />
+
+        {/* Dashboard Help */}
         <Route path="/dashboard/help" element={<ProtectedRoute isLoggedIn={isLoggedIn}><HelpCentre /></ProtectedRoute>} />
         <Route path="/dashboard/help/categories" element={<ProtectedRoute isLoggedIn={isLoggedIn}><HelpCategories /></ProtectedRoute>} />
         <Route path="/dashboard/help/categories/:id" element={<ProtectedRoute isLoggedIn={isLoggedIn}><HelpCategoryDetail /></ProtectedRoute>} />
@@ -65,6 +87,7 @@ const App: React.FC = () => {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </WalletProvider>
     </Router>
   );
 };

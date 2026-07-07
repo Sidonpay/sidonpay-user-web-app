@@ -1,6 +1,18 @@
 export type Currency = "NGN" | "USD";
 export type TransactionType = "credit" | "debit" | "funding" | "fx";
 export type TransactionStatus = "Successful" | "Pending" | "Failed" | "Reversed";
+export type CardNetwork = "visa" | "mastercard" | "verve";
+export type CardType = "debit" | "credit";
+
+export interface SavedCard {
+  id: string;
+  last4: string;
+  cardholderName: string;
+  expiryDate: string;
+  network: CardNetwork;
+  cardType: CardType;
+  isDefault: boolean;
+}
 
 export interface Transaction {
   id: string;
