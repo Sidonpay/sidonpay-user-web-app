@@ -32,11 +32,12 @@ import CardReceiptPage from "./pages/CardReceiptPage";
 import { WalletProvider } from "./context/WalletContext";
 import BankTransferPage from "./pages/BankTransferPage";
 import UssdPaymentPage from "./pages/UssdPaymentPage";
+import Onboarding from "./pages/Onboarding";
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const handleLogin = () => setIsLoggedIn(true);
-  const handleLogout = () => setIsLoggedIn(false);
+  // const handleLogout = () => setIsLoggedIn(false);
 
   return (
     <Router>
@@ -47,6 +48,7 @@ const App: React.FC = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/help" element={<HelpPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/onboarding" element={<Onboarding/>} />
 
         {/* Auth */}
         <Route path="/login" element={<Login onLogin={handleLogin} />} />

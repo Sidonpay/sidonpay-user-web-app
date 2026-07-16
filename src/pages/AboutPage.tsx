@@ -165,7 +165,7 @@ const AboutPage = () => {
             the way it should be.
           </p>
           <Link
-            to="/signup"
+            to="/onboarding"
             className="inline-flex items-center gap-2 bg-white hover:bg-gray-100 text-[#2D7A4F] text-sm font-semibold px-6 py-3 rounded-lg transition-colors"
           >
             Get Started for Free <ArrowRight size={15} />
