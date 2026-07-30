@@ -71,7 +71,7 @@ const EditLimitModal = ({
           </div>
         </div>
 
-        {/* Current Limit and Tier Cap side by side */}
+       
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="border border-gray-100 rounded-xl p-2">
             <p className="text-xs text-gray-400 mb-1.5">Current Limit</p>

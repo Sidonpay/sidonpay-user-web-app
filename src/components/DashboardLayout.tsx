@@ -232,13 +232,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
   return (
     <div className="min-h-screen flex">
-
-      {/* Desktop Left Sidebar */}
       <div className="hidden md:flex w-56 bg-[#E0F3E9] flex-col py-4 fixed h-full border-r border-green-100">
         <SidebarContent />
       </div>
-
-      {/* Mobile Sidebar Overlay */}
       {showMobileMenu && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div
@@ -261,8 +257,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
         {/* Top Navbar */}
         <div className="w-full bg-white px-4 md:px-6 py-3 flex items-center justify-between border-b border-gray-100 sticky top-0 z-10">
-
-          {/* Left - Hamburger + Breadcrumb */}
           <div className="flex items-center gap-3">
             <button
               className="md:hidden"
@@ -270,13 +264,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             >
               <Menu className="w-5 h-5 text-gray-600" />
             </button>
-            {/* <div className="flex items-center gap-2 text-xs text-gray-400">
-              <img src={BreadcrumbIcon} alt="dashboard" className="w-5 h-5" />
-              <span className="hidden sm:block">Dashboards</span>
-              <span className="hidden sm:block">/</span>
-              <span className="text-gray-800 font-bold">Home</span>
-            </div>
-          </div> */}
 
            <div className="flex items-center gap-2 text-xs text-gray-400">
           <img src={BreadcrumbIcon} alt="dashboard" className="w-5 h-5" />
@@ -285,8 +272,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           <span className="text-gray-800 font-bold">{breadcrumbCurrent}</span>
         </div>
         </div>
-
-          {/* Search - desktop only */}
           <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 w-72">
             <Search className="w-4 h-4 text-gray-400 shrink-0" />
             <input
@@ -295,8 +280,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               className="bg-transparent text-sm outline-none w-full text-gray-600 placeholder:text-gray-400"
             />
           </div>
-
-          {/* Right - User Profile */}
           <div className="relative">
             <div
               onClick={() => setShowMobileProfile(!showMobileProfile)}
@@ -316,8 +299,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 <ChevronDown className="w-4 h-4 text-gray-400" />
               )}
             </div>
-
-            {/* Mobile Profile Dropdown */}
             {showMobileProfile && (
               <div className="absolute right-0 top-12 w-72 bg-white shadow-xl rounded-xl p-4 z-50 md:hidden flex flex-col gap-4 border border-gray-100">
 
@@ -391,7 +372,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             {children}
           </div>
 
-          {/* Right Sidebar - desktop only */}
           <div className="hidden md:flex w-64 bg-white border-l border-gray-100 p-4 flex-col gap-4 shrink-0">
 
             {/* Tier Info */}
@@ -410,8 +390,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 Upgrade
               </span>
             </div>
-
-            {/* Notifications */}
             <div>
               <p className="text-sm font-semibold text-gray-700 mb-3">Notifications</p>
               <div className="flex flex-col gap-3">
@@ -432,8 +410,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 All Notifications
               </p>
             </div>
-
-            {/* Team Members - desktop only on Transfer Sidonpay */}
             {showSelectBeneficiary && (
               <div>
                 <p className="text-sm font-semibold text-green-700 mb-3">Select Beneficiary</p>

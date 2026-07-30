@@ -7,8 +7,6 @@ import ContactPage from "./pages/ContactPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import VerifyAccount from "./pages/VerifyAccount";
-import KYCBasicProfile from "./pages/KYCBasicProfile";
-import KYCTierOne from "./pages/KYCTierOne";
 import Dashboard from "./pages/Dashboard";
 import Transfer from "./pages/Transfer";
 import HelpCentre from "./pages/HelpCentre";
@@ -54,8 +52,7 @@ const App: React.FC = () => {
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/verify-account" element={<VerifyAccount />} />
-        <Route path="/kyc/basic-profile" element={<KYCBasicProfile />} />
-        <Route path="/kyc/tier-one" element={<KYCTierOne />} />
+      
 
         {/* Dashboard */}
         <Route path="/dashboard" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Dashboard /></ProtectedRoute>} />

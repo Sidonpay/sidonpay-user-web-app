@@ -52,8 +52,6 @@ const TransactionLimitsModal = ({
       percent: 100,
     },
   ];
-
-  // If editing a limit, show EditLimitModal instead
   if (editingLimit) {
     return (
       <EditLimitModal

@@ -1,7 +1,3 @@
-
-
-
-
 import { useState, useEffect } from "react";
 import SideImage from "../assets/SideImage.png";
 import Logo from "../assets/SidonPay Logo.png";

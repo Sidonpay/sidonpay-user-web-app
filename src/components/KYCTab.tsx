@@ -1,117 +1,34 @@
 import { useState } from "react";
-import { ArrowRight, CheckCircle, MessageCircle } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle,
+  MessageCircle,
+  Lock,
+  ShieldCheck,
+  Globe,
+  Sparkles,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  Crown,
+  AlertTriangle,
+} from "lucide-react";
 import { useUser } from "../context/UserContext";
 import CircularProgress from "./CircularProgress";
 import TransactionLimitsModal from "../pages/TransactionLimitsModal";
-import VerifyDocumentsModal from "../pages/VerifyDocumentsModal";
-import BVNModal from "../pages/BVNModal";
-import FileUploadModal from "../pages/FileUploadModal";
-import AddressModal from "../pages/AddressModal";
-import VerifyingModal from "../pages/VerifyingModal";
-import DocumentSubmittedModal from "../pages/DocumentSubmittedModal";
-import KYCCrownIcon from "../assets/kyc-crown-icon.png";
-import PersonIcon from "../assets/kyc-person-icon.png";
-import EmailIcon from "../assets/kyc-email-icon.png";
-import PhoneIcon from "../assets/kyc-phone-icon.png";
-import CalendarIcon from "../assets/kyc-calendar-icon.png";
-import DocumentIcon from "../assets/kyc-document-icon.png";
-import Tier0Icon from "../assets/tier0-star-icon.png";
-import Tier1Icon from "../assets/tier1-flash-icon.png";
-import Tier2Icon from "../assets/tier2-crown-icon.png";
 import AiAssistant from "../components/AiAssistant";
-
-export type DocumentStatus = "idle" | "pending" | "completed" | "failed";
-
-export interface KYCDocument {
-  id: string;
-  name: string;
-  description: string;
-  status: DocumentStatus;
-}
-
-type TierTarget = "tier1" | "tier2" | "all";
-
-type ActiveModal =
-  | "limits"
-  | "verifyDocs"
-  | "bvn"
-  | "fileUpload"
-  | "address"
-  | "verifyingBVN"
-  | "verifyingDetails"
-  | "uploadingFile"
-  | "submittedBVN"
-  | "submittedFile"
-  | "submittedAddress"
-  | null;
-
-const StatusBadge = ({ status }: { status: DocumentStatus }) => {
-  if (status === "completed") {
-    return (
-      <span className="flex items-center gap-1 text-xs text-[#1a6b3c] font-semibold">
-        <CheckCircle size={13} />
-        Completed
-      </span>
-    );
-  }
-  if (status === "pending") {
-    return (
-      <span className="text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
-        Pending
-      </span>
-    );
-  }
-  if (status === "failed") {
-    return (
-      <span className="text-xs font-semibold text-red-500 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">
-        Failed
-      </span>
-    );
-  }
-  return null;
-};
+import Tier1Verification from "./kyc/Tier1Verification";
+import Tier2Verification from "./kyc/Tier2Verification";
+import Tier3Verification from "./kyc/Tier3Verification";
 
 const KYCTab = () => {
   const { profile } = useUser();
-
-  const [activeModal, setActiveModal] = useState<ActiveModal>(null);
-  const [tierTarget, setTierTarget] = useState<TierTarget>("all");
-  const [selectedDocument, setSelectedDocument] = useState<KYCDocument | null>(null);
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [showAi, setShowAi] = useState<boolean>(false);
-  const [documents, setDocuments] = useState<KYCDocument[]>([
-    {
-      id: "bvn",
-      name: "BVN / NIN",
-      description: "Bank Verification Number or National ID",
-      status: "idle",
-    },
-    {
-      id: "id",
-      name: "Valid ID Card",
-      description: "Government-issued photo ID",
-      status: "idle",
-    },
-    {
-      id: "utility",
-      name: "Utility Bill",
-      description: "Recent utility bill (< 3 months)",
-      status: "idle",
-    },
-    {
-      id: "address",
-      name: "Proof of Address",
-      description: "Official address verification",
-      status: "idle",
-    },
-  ]);
-
-  const completedCount = documents.filter(
-    (d) => d.status === "completed"
-  ).length;
-  const completionPercent = Math.round(
-    (completedCount / documents.length) * 100
-  );
+  const [showLimitsModal, setShowLimitsModal] = useState(false);
+  const [showAi, setShowAi] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
+  const [showTier2Verification, setShowTier2Verification] = useState(false);
+  const [showTier3Verification, setShowTier3Verification] = useState(false);
 
   const fullName =
     profile.firstName && profile.lastName
@@ -124,475 +41,515 @@ const KYCTab = () => {
         month: "long",
         year: "numeric",
       })
-    : "";
+    : "—";
 
-  const updateDocStatus = (id: string, status: DocumentStatus) => {
-    setDocuments((prev) =>
-      prev.map((d) => (d.id === id ? { ...d, status } : d))
-    );
-  };
+  const isVerified = profile.kycStatus === "verified";
+  const isPending = profile.kycStatus === "pending_review";
 
-  const closeAll = () => {
-    setActiveModal(null);
-    setSelectedDocument(null);
-    setUploadFile(null);
-  };
-
-  const handleOpenUpgrade = (tier: TierTarget) => {
-    setTierTarget(tier);
-    setActiveModal("verifyDocs");
-  };
-
-  const handleDocumentSelect = (doc: KYCDocument) => {
-    setSelectedDocument(doc);
-    if (doc.id === "bvn") setActiveModal("bvn");
-    else if (doc.id === "address") setActiveModal("address");
-    else setActiveModal("fileUpload");
-  };
-
-  const handleBVNSubmit = async (_bvn: string) => {
-    setActiveModal("verifyingBVN");
-    //Replacing with real API
-    await new Promise((r) => setTimeout(r, 2000));
-    setActiveModal("submittedBVN");
-  };
-
-  const handleFileUpload = async (file: File) => {
-    setUploadFile(file);
-    setActiveModal("uploadingFile");
-    await new Promise((r) => setTimeout(r, 2000));
-    setActiveModal("submittedFile");
-  };
-
-  const handleAddressSubmit = async (_address: string) => {
-    setActiveModal("verifyingDetails");
-    await new Promise((r) => setTimeout(r, 2000));
-    setActiveModal("submittedAddress");
-  };
-
-  const handleDoneBVN = () => {
-    if (selectedDocument) updateDocStatus(selectedDocument.id, "pending");
-    closeAll();
-  };
-
-  const handleDoneFile = () => {
-    if (selectedDocument) updateDocStatus(selectedDocument.id, "pending");
-    closeAll();
-  };
-
-  const handleUploadAnother = () => {
-    setSelectedDocument(null);
-    setUploadFile(null);
-    setActiveModal("verifyDocs");
-  };
-
-  // Tier cards
+  const verifiedTiersCount =
+    (isVerified ? 1 : 0) +
+    (profile.tier2Status === "verified" ? 1 : 0) +
+    (profile.tier3Status === "verified" ? 1 : 0);
+  const completionPercent = Math.round((verifiedTiersCount / 3) * 100);
 
   const tiers = [
     {
-      icon: Tier0Icon,
-      name: "Tier 0",
-      isCurrent: profile.tier === "Tier 0",
-      requirements: [
-        { label: "Automatic for all new users", done: true },
-        { label: "No verification required", done: true },
-      ],
-      dailyLimit: "₦50,000",
-      monthlyLimit: "₦300,000",
-      maxBalance: "₦300,000",
-      isVerified: true,
-      onUpgrade: null,
-      buttonLabel: null,
-    },
-    {
-      icon: Tier1Icon,
       name: "Tier 1",
-      isCurrent: profile.tier === "Tier 1",
-      requirements: [
-        {
-          label: "BVN / NIN Verification",
-          done:
-            profile.tier === "Tier 1" || profile.tier === "Tier 2",
-        },
-        {
-          label: "Valid ID Card",
-          done:
-            profile.tier === "Tier 1" || profile.tier === "Tier 2",
-        },
-      ],
+      icon: <ShieldCheck size={20} className="text-white" />,
+      iconBg: "bg-[#1a6b3c]",
       dailyLimit: "₦200,000",
       monthlyLimit: "₦5,000,000",
-      maxBalance: "₦5,000,000",
-      isVerified: profile.tier === "Tier 1",
-      onUpgrade: () => handleOpenUpgrade("tier1"),
-      buttonLabel: profile.tier === "Tier 0" ? "Upgrade to Tier 1" : null,
+      maxBalance: "₦500,000",
+      features: ["NGN Wallet", "Local transfers", "Bill payments", "Airtime & Data"],
+      requirements: [
+        "Personal information",
+        "NIN (National Identification Number)",
+        "Residential address",
+      ],
+      isCurrent: profile.tier === "Tier 1",
+      isLocked: false,
     },
     {
-      icon: Tier2Icon,
       name: "Tier 2",
-      isCurrent: profile.tier === "Tier 2",
+      icon: <Globe size={20} className="text-white" />,
+      iconBg: "bg-[#7C3AED]",
+      dailyLimit: "₦2,000,000",
+      monthlyLimit: "₦20,000,000",
+      maxBalance: "₦5,000,000",
+      features: ["USD Wallet", "International transfers", "Currency conversion", "Higher limits"],
       requirements: [
-        { label: "Utility Bill", done: profile.tier === "Tier 2" },
-        { label: "Proof of Address", done: profile.tier === "Tier 2" },
+        "BVN (Bank Verification Number)",
+        "Utility bill",
+        "Passport photograph",
+        "Phone verification",
       ],
-      dailyLimit: "₦1,000,000",
-      monthlyLimit: "₦50,000,000",
-      maxBalance: "Unlimited",
-      isVerified: profile.tier === "Tier 2",
-      onUpgrade: () => handleOpenUpgrade("tier2"),
-      buttonLabel: profile.tier === "Tier 1" ? "Upgrade to Tier 2" : null,
+      isCurrent: profile.tier === "Tier 2",
+      isLocked: !isVerified,
+    },
+    {
+      name: "Tier 3",
+      icon: <Sparkles size={20} className="text-white" />,
+      iconBg: "bg-[#F59E0B]",
+      dailyLimit: "₦10,000,000",
+      monthlyLimit: "₦100,000,000",
+      maxBalance: "₦50,000,000",
+      features: ["Unlimited features", "Premium support", "Advanced limits", "Priority processing"],
+      requirements: ["Facial recognition", "Liveness verification"],
+      isCurrent: profile.tier === "Tier 3",
+      isLocked: profile.tier2Status !== "verified",
     },
   ];
 
-  // Render
+  const steps = [
+    { label: "Unverified", sub: "Create your account", done: true, current: false },
+    {
+      label: "Tier 1",
+      sub: "Basic verification",
+      done: isVerified,
+      current: !isVerified,
+    },
+    {
+      label: "Tier 2",
+      sub: "Enhanced verification",
+      done: profile.tier2Status === "verified",
+      current: isVerified && profile.tier2Status !== "verified",
+    },
+    {
+      label: "Tier 3",
+      sub: "Full verification",
+      done: profile.tier3Status === "verified",
+      current: profile.tier2Status === "verified" && profile.tier3Status !== "verified",
+    },
+  ];
 
-  return (
-    <>
-      <div className="flex flex-col divide-y divide-gray-100">
-
-        {/* Section 1 KYC Overview */}
-        <div className="py-6">
-          <div className="flex items-start justify-between mb-5">
-            <div className="flex items-center gap-3">
-              <img src={KYCCrownIcon} alt="KYC" className="w-8 h-8" />
-              <div>
-                <p className="text-base font-bold text-gray-900">KYC Overview</p>
-                <p className="text-sm text-gray-400">
-                  Your identity verification summary
-                </p>
-              </div>
-            </div>
-            <span className="text-xs font-semibold text-[#1a6b3c] bg-[#e8f5ee] px-3 py-1 rounded-full">
-              ✦ {profile.tier}
-            </span>
-          </div>
-
-          {/* User info boxes */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-            <div className="flex items-center gap-3 border border-gray-100 rounded-xl px-4 py-3 shadow-sm bg-white">
-              <img src={PersonIcon} alt="person-icon"/>
-              <div>
-                <p className="text-xs text-gray-400">Full Name</p>
-                <p className="text-sm font-semibold text-gray-800">{fullName}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 border border-gray-100 rounded-xl px-4 py-3 shadow-sm bg-white">
-              <img src={EmailIcon} alt="email-icon"/>
-              <div>
-                <p className="text-xs text-gray-400">Email Address</p>
-                <p className="text-sm font-semibold text-gray-800">{profile.email}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 border border-gray-100 rounded-xl px-4 py-3 shadow-sm bg-white">
-              <img src={PhoneIcon} alt="phone-icon"/>
-              <div>
-                <p className="text-xs text-gray-400">Phone Number</p>
-                <p className="text-sm font-semibold text-gray-800">{profile.phoneNumber}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 border border-gray-100 rounded-xl px-4 py-3 shadow-sm bg-white">
-              <img src={CalendarIcon} alt="calender-icon" />
-              <div>
-                <p className="text-xs text-gray-400">Date of Birth</p>
-                <p className="text-sm font-semibold text-gray-800">{formattedDOB}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Limits */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            {[
-              { label: "Daily Limit", value: profile.dailyLimit },
-              { label: "Monthly Limit", value: profile.monthlyLimit },
-              { label: "Max Balance", value: profile.maxBalance },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="py-4 px-3 text-center border border-gray-100 rounded-2xl bg-gray-100 shadow-sm"
-              >
-                <p className="text-xs text-gray-500 mb-1">{item.label}</p>
-                <p className="text-sm font-bold text-gray-900">{item.value}</p>
-              </div>
-            ))}
-          </div>
-
-          <button
-            onClick={() => setActiveModal("limits")}
-            className="flex items-center gap-1.5 text-sm font-semibold text-[#1a6b3c] hover:underline mx-auto"
-          >
-            Manage Transaction Limits
-            <ArrowRight size={15} />
-          </button>
+  // Tier 1 Verification flow
+  if (showVerification || isPending) {
+    return (
+      <>
+        <div className="pb-24">
+          <Tier1Verification onBackToProfile={() => setShowVerification(false)} />
         </div>
 
-        {/* Section 2 Verification Status */}
-        <div className="py-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <CircularProgress
-                percent={completionPercent}
-                size={32}
-                strokeWidth={3}
-              />
-              <div>
-                <p className="text-base font-bold text-gray-900">
-                  Verification Status
-                </p>
-                <p className="text-sm text-gray-400">
-                  Track your identity verification progress
-                </p>
-              </div>
-            </div>
-            <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-              {completionPercent === 100 ? "Completed" : "In Progress"}
-            </span>
-          </div>
-
-          {/* Progress bar */}
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-semibold text-gray-700">Completion</p>
-            <p className="text-sm font-bold text-[#1a6b3c]">{completionPercent}%</p>
-          </div>
-          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-5">
-            <div
-              className="h-full bg-[#1a6b3c] rounded-full transition-all duration-700"
-              style={{ width: `${completionPercent}%` }}
-            />
-          </div>
-
-          {/* Required Documents */}
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
-            Required Documents
-          </p>
-
-          <div className="flex flex-col gap-2 mb-5">
-            {documents.map((doc) => (
-              <div
-                key={doc.id}
-                className="flex items-center justify-between w-full py-3.5 px-4 rounded-xl border border-gray-100 bg-white shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <img
-                    src={DocumentIcon}
-                    alt=""
-                    className="w-8 h-8 shrink-0"
-                  />
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">
-                      {doc.name}
-                    </p>
-                    <p className="text-xs text-gray-400">{doc.description}</p>
-                  </div>
-                </div>
-                <StatusBadge status={doc.status} />
-              </div>
-            ))}
-          </div>
-
-          {/* Continue Verification */}
-          <button
-            onClick={() => handleOpenUpgrade("all")}
-            className="w-full py-3.5 bg-[#1a6b3c] text-white text-sm font-semibold rounded-xl hover:bg-[#155c33] transition-colors flex items-center justify-center gap-2"
-          >
-            Continue Verification
-            <ArrowRight size={16} />
-          </button>
-        </div>
-
-        {/* Section 3 Account Tiers */}
-        <div className="py-6">
-          <p className="text-base font-bold text-gray-900 mb-1">Account Tiers</p>
-          <p className="text-sm text-gray-400 mb-5">
-            Compare tier levels and upgrade for higher limits
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {tiers.map((tier) => (
-              <div
-                key={tier.name}
-                className={`relative rounded-2xl p-5 border-2 bg-white flex flex-col justify-between shadow-sm transition-all ${
-                  tier.isCurrent
-                    ? "border-[#A7F3D0] bg-[#f5fbf7]"
-                    : "border-gray-200"
-                }`}
-              >
-                {/* CURRENT badge */}
-                {tier.isCurrent && (
-                  <div className="absolute -top-3.5 left-4">
-                    <span className="text-xs font-bold text-white bg-[#059669] px-3 py-1 rounded-full">
-                      CURRENT
-                    </span>
-                  </div>
-                )}
-
-                <div>
-                  <div className="flex items-center gap-2.5 mb-4 mt-1">
-                    <img src={tier.icon} alt={tier.name} className="w-7 h-7" />
-                    <p className="text-base font-bold text-gray-900">{tier.name}</p>
-                  </div>
-
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-                    Requirements
-                  </p>
-                  <ul className="flex flex-col gap-2 mb-5">
-                    {tier.requirements.map((req, i) => (
-                      <li
-                        key={i}
-                        className="flex items-center gap-2 text-xs text-gray-700"
-                      >
-                        <span
-                          className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                            req.done
-                              ? "bg-[#e8f5ee] border-[#1a6b3c]"
-                              : "border-gray-300"
-                          }`}
-                        >
-                          <CheckCircle
-                            size={11}
-                            className={
-                              req.done ? "text-[#1a6b3c]" : "text-gray-300"
-                            }
-                          />
-                        </span>
-                        {req.label}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="flex flex-col gap-2 mb-5">
-                    {[
-                      { label: "Daily Limit", value: tier.dailyLimit },
-                      { label: "Monthly Limit", value: tier.monthlyLimit },
-                      { label: "Max Balance", value: tier.maxBalance },
-                    ].map((item) => (
-                      <div
-                        key={item.label}
-                        className="flex items-center justify-between"
-                      >
-                        <span className="text-xs text-gray-400">{item.label}</span>
-                        <span className="text-xs font-bold text-gray-900">
-                          {item.value}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  {tier.isVerified && (
-                    <div className="flex items-center justify-center gap-1.5 text-xs text-[#1a6b3c] font-semibold py-1">
-                      <CheckCircle size={13} />
-                      Verified
-                    </div>
-                  )}
-                  {tier.buttonLabel && tier.onUpgrade && (
-                    <button
-                      onClick={tier.onUpgrade}
-                      className="w-full py-3 bg-[#1a6b3c] text-white text-sm font-semibold rounded-xl hover:bg-[#155c33] transition-colors flex items-center justify-center gap-2"
-                    >
-                      {tier.buttonLabel}
-                      <ArrowRight size={14} />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
         <button
           onClick={() => setShowAi(true)}
           className="fixed bottom-6 right-6 w-12 h-12 bg-[#2D7A51] rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition z-40"
         >
           <MessageCircle className="w-5 h-5 text-white" />
         </button>
-
-        {/* AI Assistant overlay */}
         {showAi && <AiAssistant onClose={() => setShowAi(false)} />}
+      </>
+    );
+  }
+
+  // Tier 2 Verification flow
+  if (showTier2Verification || profile.tier2Status === "pending_review") {
+    return (
+      <>
+        <div className="pb-24">
+          <Tier2Verification onBackToProfile={() => setShowTier2Verification(false)} />
+        </div>
+
+        <button
+          onClick={() => setShowAi(true)}
+          className="fixed bottom-6 right-6 w-12 h-12 bg-[#2D7A51] rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition z-40"
+        >
+          <MessageCircle className="w-5 h-5 text-white" />
+        </button>
+        {showAi && <AiAssistant onClose={() => setShowAi(false)} />}
+      </>
+    );
+  }
+
+  // Tier 3 Verification flow
+  if (showTier3Verification) {
+    return (
+      <>
+        <div className="pb-24">
+          <Tier3Verification onBackToProfile={() => setShowTier3Verification(false)} />
+        </div>
+
+        <button
+          onClick={() => setShowAi(true)}
+          className="fixed bottom-6 right-6 w-12 h-12 bg-[#2D7A51] rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition z-40"
+        >
+          <MessageCircle className="w-5 h-5 text-white" />
+        </button>
+        {showAi && <AiAssistant onClose={() => setShowAi(false)} />}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="flex flex-col gap-6 pb-24">
+        {/* Alert banner — Tier 1 */}
+        {!isVerified && !isPending && (
+          <div className="flex items-center justify-between gap-3 bg-[#EAF7EE] border border-[#B7E4C7] rounded-xl px-4 py-3">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <span className="w-10 h-10 rounded-lg bg-white border border-[#B7E4C7] flex items-center justify-center shrink-0">
+                <AlertTriangle size={17} className="text-[#1a6b3c]" />
+              </span>
+              <p className="text-sm text-[#1a6b3c] truncate min-w-0">
+                Verify your identity to start transacting. Complete Tier 1 to unlock your NGN wallet.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowVerification(true)}
+              className="flex items-center gap-1 text-sm font-semibold text-white bg-[#1a6b3c] px-4 py-2 rounded-lg shrink-0"
+            >
+              Upgrade Now <ArrowRight size={15} />
+            </button>
+          </div>
+        )}
+
+        {/* Alert banner Tier 2 */}
+        {isVerified && profile.tier2Status === "not_started" && (
+          <div className="flex items-center justify-between gap-3 bg-[#EAF7EE] border border-[#B7E4C7] rounded-xl px-4 py-3">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <span className="w-10 h-10 rounded-lg bg-white border border-[#B7E4C7] flex items-center justify-center shrink-0">
+                <AlertTriangle size={17} className="text-[#1a6b3c]" />
+              </span>
+              <p className="text-sm text-[#1a6b3c] truncate min-w-0">
+                Verify your identity to start transacting. Complete Tier 2 to unlock your wallet.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowTier2Verification(true)}
+              className="flex items-center gap-1 text-sm font-semibold text-white bg-[#1a6b3c] px-4 py-2 rounded-lg shrink-0"
+            >
+              Start Now <ArrowRight size={15} />
+            </button>
+          </div>
+        )}
+
+        {/* Alert banner Tier 3 */}
+        {profile.tier2Status === "verified" && profile.tier3Status === "not_started" && (
+          <div className="flex items-center justify-between gap-3 bg-[#EAF7EE] border border-[#B7E4C7] rounded-xl px-4 py-3">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <span className="w-10 h-10 rounded-lg bg-white border border-[#B7E4C7] flex items-center justify-center shrink-0">
+                <AlertTriangle size={17} className="text-[#1a6b3c]" />
+              </span>
+              <p className="text-sm text-[#1a6b3c] truncate min-w-0">
+                Verify your identity to start transacting. Complete Tier 3 to unlock your wallet.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowTier3Verification(true)}
+              className="flex items-center gap-1 text-sm font-semibold text-white bg-[#1a6b3c] px-4 py-2 rounded-lg shrink-0"
+            >
+              Start Now <ArrowRight size={15} />
+            </button>
+          </div>
+        )}
+
+        {/* Account Verification card */}
+        <div className="border border-gray-100 rounded-2xl p-5 shadow-sm bg-white">
+          <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <span className="w-11 h-11 rounded-xl bg-[#EAF7EE] flex items-center justify-center shrink-0">
+                <Crown size={20} className="text-[#1a6b3c]" />
+              </span>
+              <div>
+                <p className="text-base font-bold text-gray-900">Account Verification</p>
+                <p className="text-xs text-gray-400">
+                  {completionPercent === 100
+                    ? "Verified"
+                    : isVerified
+                    ? "In Progress"
+                    : "Not Started"}{" "}
+                  · {profile.tier}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() =>
+                profile.tier2Status === "verified"
+                  ? setShowTier3Verification(true)
+                  : isVerified
+                  ? setShowTier2Verification(true)
+                  : setShowVerification(true)
+              }
+              className="flex items-center gap-1 text-sm font-semibold text-white bg-[#1a6b3c] px-4 py-2 rounded-lg shrink-0"
+            >
+              Upgrade Account <ArrowRight size={15} />
+            </button>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-start gap-6">
+            <div className="flex items-center gap-6 flex-1 min-w-0 w-full">
+              <CircularProgress percent={completionPercent} size={72} strokeWidth={6} />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 min-w-0">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center shrink-0">
+                    <User size={15} className="text-gray-400" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wide">Full Name</p>
+                    <p className="text-sm font-semibold text-gray-800 truncate">{fullName || "—"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center shrink-0">
+                    <Mail size={15} className="text-gray-400" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wide">Email</p>
+                    <p
+                      className="text-sm font-semibold text-gray-800 truncate"
+                      title={profile.email}
+                    >
+                      {profile.email || "—"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center shrink-0">
+                    <Phone size={15} className="text-gray-400" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wide">Phone</p>
+                    <p className="text-sm font-semibold text-gray-800 truncate">
+                      {profile.phoneNumber || "—"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center shrink-0">
+                    <Calendar size={15} className="text-gray-400" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wide">
+                      Date of Birth
+                    </p>
+                    <p className="text-sm font-semibold text-gray-800 truncate">{formattedDOB}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="border border-gray-200 rounded-xl px-4 py-3 shrink-0 w-full sm:w-auto sm:min-w-[150px] bg-gray-50">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-2">
+                Current Limits
+              </p>
+              <div className="flex flex-col gap-1.5 text-xs">
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500">Daily</span>
+                  <span className="font-bold text-gray-900">
+                    {isVerified ? profile.dailyLimit : "NO"}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500">Monthly</span>
+                  <span className="font-bold text-gray-900">
+                    {isVerified ? profile.monthlyLimit : "NO"}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500">Max Balance</span>
+                  <span className="font-bold text-gray-900">
+                    {isVerified ? profile.maxBalance : "NO"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setShowLimitsModal(true)}
+            className="flex items-center gap-1.5 text-sm font-semibold text-[#1a6b3c] hover:underline mx-auto mt-5"
+          >
+            Manage Transaction Limits <ArrowRight size={15} />
+          </button>
+        </div>
+
+        {/* Verification Progress card */}
+        <div className="border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm bg-white">
+          <p className="text-sm font-bold text-gray-700 mb-4 sm:mb-5">Verification Progress</p>
+          <div className="flex items-start w-full">
+            {steps.map((step, i) => (
+              <div key={step.label} className="flex items-center flex-1 min-w-0">
+                <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
+                  <div
+                    className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border-2 shrink-0 text-xs sm:text-sm ${
+                      step.done
+                        ? "bg-[#1a6b3c] border-[#1a6b3c] text-white"
+                        : step.current
+                        ? "border-[#1a6b3c] text-[#1a6b3c]"
+                        : "border-gray-200 text-gray-300"
+                    }`}
+                  >
+                    {step.done ? <CheckCircle size={14} /> : i + 1}
+                  </div>
+                  <p className="text-[10px] sm:text-xs font-semibold text-gray-700 text-center leading-tight px-0.5">
+                    {step.label}
+                  </p>
+                  <p className="hidden md:block text-[11px] text-gray-400 text-center leading-tight">
+                    {step.sub}
+                  </p>
+                  {step.current && (
+                    <span className="text-[8px] sm:text-[10px] font-semibold text-blue-600 bg-blue-50 px-1 sm:px-2 py-0.5 rounded-full whitespace-nowrap">
+                      In Progress
+                    </span>
+                  )}
+                </div>
+                {i < steps.length - 1 && (
+                  <div
+                    className={`h-0.5 mx-0.5 sm:mx-2 w-3 sm:w-auto sm:flex-1 shrink-0 sm:shrink ${
+                      step.done ? "bg-[#1a6b3c]" : "bg-gray-200"
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Account Tiers */}
+        <div>
+          <p className="text-base font-bold text-gray-900 mb-4">Account Tiers</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {tiers.map((tier) => (
+              <div
+                key={tier.name}
+                className={`rounded-2xl p-5 border-2 bg-white flex flex-col justify-between ${
+                  tier.isCurrent ? "border-[#1a6b3c]" : "border-gray-200"
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`p-2.5 rounded-xl ${tier.iconBg}`}>{tier.icon}</div>
+                    {tier.isLocked && (
+                      <span className="flex items-center gap-1 text-xs text-gray-400">
+                        <Lock size={11} /> Locked
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-base font-bold text-gray-900 mb-3">{tier.name}</p>
+
+                  <div className="flex flex-col gap-1.5 mb-4 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Daily limit</span>
+                      <span className="font-bold text-gray-900">{tier.dailyLimit}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Monthly limit</span>
+                      <span className="font-bold text-gray-900">{tier.monthlyLimit}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Max balance</span>
+                      <span className="font-bold text-gray-900">{tier.maxBalance}</span>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">
+                    Features Unlocked
+                  </p>
+                  <ul className="flex flex-col gap-1 mb-4">
+                    {tier.features.map((f) => (
+                      <li key={f} className="flex items-center gap-1.5 text-xs text-gray-700">
+                        <CheckCircle size={12} className="text-[#1a6b3c]" /> {f}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">
+                    Requirements
+                  </p>
+                  <ul className="flex flex-col gap-1 mb-5">
+                    {tier.requirements.map((r) => (
+                      <li key={r} className="text-xs text-gray-500">
+                        • {r}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                  {tier.name === "Tier 1" && !isVerified && !isPending && (
+                  <button
+                    onClick={() => setShowVerification(true)}
+                    className="w-full py-2.5 bg-[#1a6b3c] text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2"
+                  >
+                    Upgrade to Tier 1 <ArrowRight size={14} />
+                  </button>
+                )}
+                {tier.name === "Tier 1" && isVerified && (
+                  <button
+                    onClick={() => setShowVerification(true)}
+                    className="w-full py-2.5 bg-[#EAF7EE] text-[#1a6b3c] text-sm font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-[#DCF0E4] transition-colors"
+                  >
+                    <CheckCircle size={14} /> Completed
+                  </button>
+                )}
+
+                {tier.name === "Tier 2" &&
+                  isVerified &&
+                  profile.tier2Status !== "verified" &&
+                  profile.tier2Status !== "pending_review" && (
+                    <button
+                      onClick={() => setShowTier2Verification(true)}
+                      className="w-full py-2.5 bg-[#7C3AED] text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2"
+                    >
+                      Upgrade to Tier 2 <ArrowRight size={14} />
+                    </button>
+                  )}
+                {tier.name === "Tier 2" && profile.tier2Status === "verified" && (
+                  <button
+                    onClick={() => setShowTier2Verification(true)}
+                    className="w-full py-2.5 bg-[#EEF2FF] text-[#7C3AED] text-sm font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-[#E0E7FF] transition-colors"
+                  >
+                    <CheckCircle size={14} /> Completed
+                  </button>
+                )}
+
+                {tier.name === "Tier 3" &&
+                  profile.tier2Status === "verified" &&
+                  profile.tier3Status !== "verified" && (
+                    <button
+                      onClick={() => setShowTier3Verification(true)}
+                      className="w-full py-2.5 bg-[#F59E0B] text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2"
+                    >
+                      Upgrade to Tier 3 <ArrowRight size={14} />
+                    </button>
+                  )}
+                {tier.name === "Tier 3" && profile.tier3Status === "verified" && (
+                  <button
+                    onClick={() => setShowTier3Verification(true)}
+                    className="w-full py-2.5 bg-amber-50 text-[#F59E0B] text-sm font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-amber-100 transition-colors"
+                  >
+                    <CheckCircle size={14} /> Completed
+                  </button>
+                )}
+
+                {tier.isLocked && (
+                  <button
+                    disabled
+                    className="w-full py-2.5 bg-gray-100 text-gray-400 text-sm font-semibold rounded-xl flex items-center justify-center gap-2"
+                  >
+                    <Lock size={13} /> Locked
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Modals */}
+      <button
+        onClick={() => setShowAi(true)}
+        className="fixed bottom-6 right-6 w-12 h-12 bg-[#2D7A51] rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition z-40"
+      >
+        <MessageCircle className="w-5 h-5 text-white" />
+      </button>
 
-      {activeModal === "limits" && (
+      {showAi && <AiAssistant onClose={() => setShowAi(false)} />}
+
+      {showLimitsModal && (
         <TransactionLimitsModal
           dailyLimit={profile.dailyLimit}
           monthlyLimit={profile.monthlyLimit}
           maxBalance={profile.maxBalance}
-          onClose={closeAll}
-        />
-      )}
-
-      {activeModal === "verifyDocs" && (
-        <VerifyDocumentsModal
-          documents={documents}
-          tierTarget={tierTarget}
-          onSelect={handleDocumentSelect}
-          onClose={closeAll}
-        />
-      )}
-
-      {activeModal === "bvn" && (
-        <BVNModal
-          onBack={() => setActiveModal("verifyDocs")}
-          onClose={closeAll}
-          onSubmit={handleBVNSubmit}
-        />
-      )}
-
-      {activeModal === "fileUpload" && selectedDocument && (
-        <FileUploadModal
-          document={selectedDocument}
-          onBack={() => setActiveModal("verifyDocs")}
-          onClose={closeAll}
-          onUpload={handleFileUpload}
-        />
-      )}
-
-      {activeModal === "address" && (
-        <AddressModal
-          onBack={() => setActiveModal("verifyDocs")}
-          onClose={closeAll}
-          onSubmit={handleAddressSubmit}
-        />
-      )}
-
-      {activeModal === "verifyingBVN" && (
-        <VerifyingModal type="verifying" onClose={closeAll} />
-      )}
-
-      {activeModal === "verifyingDetails" && (
-        <VerifyingModal type="verifyingDetails" onClose={closeAll}/>
-      )}
-
-{activeModal === "uploadingFile" && (
-        <VerifyingModal
-          type="uploading"
-          fileName={uploadFile?.name}
-          onClose={closeAll}
-        />
-      )}
-
-      {activeModal === "submittedBVN" && selectedDocument && (
-        <DocumentSubmittedModal
-          documentName={selectedDocument.name}
-          submitType="number"
-          onDone={handleDoneBVN}
-        />
-      )}
-
-      {activeModal === "submittedFile" && selectedDocument && (
-        <DocumentSubmittedModal
-          documentName={selectedDocument.name}
-          submitType="file"
-          onDone={handleDoneFile}
-          onUploadAnother={handleUploadAnother}
-        />
-      )}
-
-      {activeModal === "submittedAddress" && selectedDocument && (
-        <DocumentSubmittedModal
-          documentName={selectedDocument.name}
-          submitType="address"
-          onDone={handleDoneFile}
+          onClose={() => setShowLimitsModal(false)}
         />
       )}
     </>

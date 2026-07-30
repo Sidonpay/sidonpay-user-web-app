@@ -85,7 +85,6 @@ const NgnWalletPage: React.FC = () => {
         />
       </div>
 
-      {/* Transaction History */}
       <TransactionHistory transactions={transactions} />
 
       {/* Floating AI Assistant button */}

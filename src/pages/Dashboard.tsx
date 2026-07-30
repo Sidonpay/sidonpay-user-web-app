@@ -82,8 +82,6 @@ const Dashboard: React.FC = () => {
   const [showUSD, setShowUSD] = useState<boolean>(true);
   const [showAi, setShowAi] = useState<boolean>(false);
   const [activeWallet, setActiveWallet] = useState<WalletFilter>("all");
-
-  // Clicking a wallet card filters Recent Transactions to that currency only
   const visibleTransactions = useMemo(() => {
     if (activeWallet === "all") return mockAllTransactions;
     return mockAllTransactions.filter((tx) => tx.currency === activeWallet);
@@ -91,17 +89,11 @@ const Dashboard: React.FC = () => {
 
   return (
     <DashboardLayout userName="Freya">
-
-      {/* Greeting */}
       <div className="mb-6">
         <h2 className="text-xl md:text-2xl font-bold text-gray-800">Welcome back!</h2>
         <p className="text-sm text-gray-400 mt-1">Manage your wallets and transactions</p>
       </div>
-
-      {/* Wallet Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-
-        {/* NGN Wallet */}
         <button
           onClick={() => setActiveWallet(activeWallet === "NGN" ? "all" : "NGN")}
           className={`text-left border-2 rounded-xl p-4 transition-colors ${
@@ -191,8 +183,6 @@ const Dashboard: React.FC = () => {
           </div>
         </button>
       </div>
-
-      {/* Recent Transactions — simple list, no search/filter bar, no action buttons */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <p className="text-base font-bold text-gray-800">Recent Transactions</p>

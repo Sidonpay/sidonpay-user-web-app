@@ -269,8 +269,6 @@ const AddMoneyPage: React.FC = () => {
               </button>
             ))}
           </div>
-
-          {/* Amount — only shows after selecting an AVAILABLE method */}
           {selectedMethod && (
             <>
               <p className="text-xs font-bold text-gray-800 uppercase tracking-wide mb-3">
@@ -352,8 +350,6 @@ const AddMoneyPage: React.FC = () => {
           )}
         </div>
       )}
-
-      {/* Agent / Bank Deposit Details */}
       {step === "agent-details" && (
         <div className="max-w-2xl mx-auto">
           <button

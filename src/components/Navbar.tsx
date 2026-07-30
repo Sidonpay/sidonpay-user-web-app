@@ -23,8 +23,6 @@ const Navsection = () => {
           <Link to="/" className="flex items-center gap-1.5">
             <img src={Logo} alt="SidonPay" className="h-15"/>
           </Link>
-
-          {/* Desktop center links */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map(({ label, to }) => (
               <Link

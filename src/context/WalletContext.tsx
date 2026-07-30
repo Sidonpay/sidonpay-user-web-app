@@ -134,8 +134,6 @@ const initialUsdTransactions: Transaction[] = [
     amount: 14280.50, currency: "USD",
   },
 ];
-
-// ── No saved cards by default — user starts with empty state ──
 const initialSavedCards: SavedCard[] = [];
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -172,7 +170,6 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   const addCard = (card: SavedCard) => {
     setSavedCards((prev) => {
-      // If this is the first card, make it default automatically
       if (prev.length === 0) {
         return [{ ...card, isDefault: true }];
       }
@@ -183,8 +180,6 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const removeCard = (id: string) => {
     setSavedCards((prev) => {
       const filtered = prev.filter((c) => c.id !== id);
-      // If the removed card was default and other cards exist,
-      // automatically promote the first remaining card to default
       const removedCard = prev.find((c) => c.id === id);
       if (removedCard?.isDefault && filtered.length > 0) {
         return filtered.map((c, i) =>

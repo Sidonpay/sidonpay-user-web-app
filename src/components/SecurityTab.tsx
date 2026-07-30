@@ -74,7 +74,7 @@ const Row = ({ title, subtitle, right, highlight = false, onClick }: RowProps) =
   return (
     <div className="flex flex-col gap-6">
 
-      {/* ── Section 1: Manage PIN and Security ── */}
+      {/* Manage PIN and Security */}
       <div className="flex flex-col gap-3">
         <p className="text-sm font-semibold text-gray-700">
           Manage PIN and Security
@@ -122,7 +122,7 @@ const Row = ({ title, subtitle, right, highlight = false, onClick }: RowProps) =
         />
       </div>
 
-      {/* ── Section 2: Notification Preferences ── */}
+      {/* Notification Preferences */}
       <div className="flex flex-col gap-3">
         <p className="text-sm font-semibold text-gray-700">
           Notification Preferences

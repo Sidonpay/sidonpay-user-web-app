@@ -202,8 +202,6 @@ const ManageCardsPage: React.FC = () => {
 
         <h1 className="text-xl font-bold text-gray-800 mb-1">Saved Cards</h1>
         <p className="text-sm text-gray-400 mb-6">Manage your linked debit and credit cards</p>
-
-        {/* Security notice — only shows when no cards saved */}
         {savedCards.length === 0 && (
           <div className="flex items-start gap-3 bg-[#EEF7F0] border border-green-200 rounded-xl p-4 mb-6">
             <Shield size={16} className="text-[#2D7A51] shrink-0 mt-0.5" />
@@ -239,8 +237,6 @@ const ManageCardsPage: React.FC = () => {
             ))}
           </div>
         )}
-
-        {/* Add Card button — always visible */}
         <button
           onClick={() => navigate("/add-card")}
           className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 hover:border-[#2D7A51] hover:text-[#2D7A51] text-gray-500 text-sm font-medium py-3.5 rounded-xl transition-colors"
@@ -249,8 +245,6 @@ const ManageCardsPage: React.FC = () => {
           Add Card
         </button>
       </div>
-
-      {/* Delete confirmation modal */}
       {cardToDelete && (
         <DeleteModal
           card={cardToDelete}
