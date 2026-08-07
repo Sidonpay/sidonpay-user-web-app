@@ -109,8 +109,6 @@ const Row = ({ title, subtitle, right, highlight = false, onClick }: RowProps) =
           }
           onClick={() => setActiveRow("pin")}
         />
-
-        {/* Two-Factor Authentication */}
         <Row
         highlight={activeRow === "2fa"}
           title="Two-Factor Authentication"
@@ -121,14 +119,10 @@ const Row = ({ title, subtitle, right, highlight = false, onClick }: RowProps) =
           onClick={() => setActiveRow("2fa")}
         />
       </div>
-
-      {/* Notification Preferences */}
       <div className="flex flex-col gap-3">
         <p className="text-sm font-semibold text-gray-700">
           Notification Preferences
         </p>
-
-        {/* Email Notifications */}
         <Row
          highlight={activeRow === "email"}
           title="Email Notifications"
@@ -141,8 +135,6 @@ const Row = ({ title, subtitle, right, highlight = false, onClick }: RowProps) =
           }
           onClick={() => setActiveRow("email")}
         />
-
-        {/* SMS Notifications */}
         <Row
          highlight={activeRow === "sms"}
           title="SMS Notifications"
@@ -162,12 +154,8 @@ const Row = ({ title, subtitle, right, highlight = false, onClick }: RowProps) =
         >
           <MessageCircle className="w-5 h-5 text-white" />
         </button>
-
-        {/* AI Assistant overlay */}
         {showAi && <AiAssistant onClose={() => setShowAi(false)} />}
-      </div>
-    // </div>
-    
+      </div>  
   );
 };
 

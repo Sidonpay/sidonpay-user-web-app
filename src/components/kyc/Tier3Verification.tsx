@@ -79,8 +79,6 @@ const Tier3Verification: React.FC<Tier3VerificationProps> = ({ onBackToProfile }
       </div>
     );
   }
-
-  // Celebration (one-time, right after approval)
   if (profile.tier3Status === "verified" && celebrate) {
     return (
       <div className="border border-gray-100 rounded-2xl shadow-sm bg-white p-5 sm:p-7">
@@ -111,8 +109,6 @@ const Tier3Verification: React.FC<Tier3VerificationProps> = ({ onBackToProfile }
       </div>
     );
   }
-
-  // Persistent detailed verified card
   if (profile.tier3Status === "verified") {
     return (
       <div className="border border-gray-100 rounded-2xl shadow-sm bg-white overflow-hidden">
@@ -203,8 +199,6 @@ const Tier3Verification: React.FC<Tier3VerificationProps> = ({ onBackToProfile }
       </div>
     );
   }
-
-  // Active liveness check
   return (
     <div className="border border-gray-100 rounded-2xl shadow-sm bg-white p-5 sm:p-7">
       <button

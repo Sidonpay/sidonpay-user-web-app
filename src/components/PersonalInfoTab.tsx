@@ -70,8 +70,6 @@ interface ErrorState {
   dateOfBirth: string;
 }
 
-// Validation
-
 const validate = (form: FormState): ErrorState => {
   const e: ErrorState = {
     firstName: "",
@@ -168,8 +166,6 @@ const CountryDropdown = ({
   );
 };
 
-// Field Component
-
 interface FieldProps {
   label: React.ReactNode;
   value: string;
@@ -224,8 +220,6 @@ const Field = ({
     {error && <p className="text-[11px] text-red-500">{error}</p>}
   </div>
 );
-
-// Main Component
 
 const PersonalInfoTab = ({ emailVerified = false }: Props) => {
   const navigate = useNavigate();
@@ -306,7 +300,6 @@ const PersonalInfoTab = ({ emailVerified = false }: Props) => {
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
-        {/* First Name */}
         <Field
           label="First Name"
           placeholder="Enter first name"
@@ -368,7 +361,6 @@ const PersonalInfoTab = ({ emailVerified = false }: Props) => {
           )}
         </div>
 
-        {/* Date of Birth */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs text-gray-500 font-medium">
             Date of Birth
@@ -384,7 +376,6 @@ const PersonalInfoTab = ({ emailVerified = false }: Props) => {
           />
         </div>
 
-        {/* Email */}
         <Field
           label={
             <span className="flex items-center gap-1">
@@ -406,7 +397,6 @@ const PersonalInfoTab = ({ emailVerified = false }: Props) => {
           onChange={(v) => handleChange("email", v)}
         />
 
-        {/* KYC Status */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs text-gray-500 font-medium">KYC Status</label>
           <div className="w-full border border-gray-200 bg-white rounded-xl px-4 py-3">
@@ -415,8 +405,6 @@ const PersonalInfoTab = ({ emailVerified = false }: Props) => {
         </div>
 
       </div>
-
-      {/* Save button */}
       {anyEditing && (
         <div className="mt-8 flex justify-end">
           <button

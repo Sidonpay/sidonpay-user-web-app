@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Search } from "lucide-react";
 import type { Transaction, TransactionFilters, TransactionType, TransactionStatus } from "../../types/wallet";

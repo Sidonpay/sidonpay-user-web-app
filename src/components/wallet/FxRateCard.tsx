@@ -1,4 +1,3 @@
-
 import { RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
 
 interface Props {

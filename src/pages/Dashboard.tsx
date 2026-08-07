@@ -26,7 +26,7 @@ const ngnWalletSummary = {
 const usdWalletSummary = {
   currency: "USD" as Currency,
   flagSrc: FlagUSD,
-  balance: 0.0,
+  balance: 1847.50,
   cardNumber: "5432****8901",
 };
 

@@ -1,28 +1,29 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Plus, ArrowLeftRight, MessageCircle } from "lucide-react";
+import { Eye, EyeOff, ArrowLeftRight, ArrowDownToLine, MessageCircle } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import FlagUSD from "../assets/flag-usd.png";
-import TransactionLimitBar from "../components/wallet/TransactionLimitBar";
-import FxRateCard from "../components/wallet/FxRateCard";
 import TransactionHistory from "../components/wallet/TransactionHistory";
+import UsdBankDetailsCard from "../components/wallet/UsdBankDetailsCard";
+import ConversionSidePanel from "../components/wallet/ConversionSidePanel";
+import ReceiveOnlyBanner from "../components/wallet/ReceiveOnlyBanner";
 import { useWallet } from "../context/WalletContext";
 import AiAssistant from "../components/AiAssistant";
-
-const fxRate = {
-  pair: "USD → NGN",
-  rate: 1351.59,
-  changeValue: -3.39,
-  changePercent: -0.25,
-  updatedAt: "00:01",
-};
 
 const UsdWalletPage: React.FC = () => {
   const navigate = useNavigate();
   const [showBalance, setShowBalance] = useState(true);
   const [showAi, setShowAi] = useState<boolean>(false);
-  const { usdBalance, usdTransactions } = useWallet();
-  const transactions = usdTransactions;
+
+  const {
+    usdBalance,
+    ngnBalance,
+    usdTransactions,
+    usdBankDetails,
+    liveRate,
+  } = useWallet();
+
+  const ngnEquivalent = usdBalance * liveRate.usdToNgn;
 
   return (
     <DashboardLayout
@@ -37,15 +38,23 @@ const UsdWalletPage: React.FC = () => {
       </div>
 
       {/* Balance Card */}
-      <div className="border-2 border-gray-200 rounded-xl p-5 mb-6">
-        <img src={FlagUSD} alt="USD" className="w-10 h-10 rounded-full object-cover mb-3" />
+      <div className="border-2 border-gray-200 rounded-xl p-5 mb-6 shadow-xl">
+        <div className="flex items-center justify-between mb-3">
+          <img src={FlagUSD} alt="USD" className="w-10 h-10 rounded-full object-cover" />
+          <span className="flex items-center gap-1.5 text-xs font-semibold bg-green-50 text-green-600 px-3 py-1 rounded-full">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-600" />
+            Active
+          </span>
+        </div>
+
         <p className="text-xs text-gray-400 mb-1">Available Balance</p>
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-1">
           <p className="text-2xl font-bold text-[#2D7A51]">
             {showBalance
               ? `$${usdBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
               : "$••••••"}
           </p>
+          <span className="text-xs font-semibold text-gray-400">USD</span>
           <button onClick={() => setShowBalance(!showBalance)}>
             {showBalance ? (
               <Eye className="w-4 h-4 text-[#2D7A51]" />
@@ -54,56 +63,41 @@ const UsdWalletPage: React.FC = () => {
             )}
           </button>
         </div>
-        <p className="text-xs text-gray-400">Card Number</p>
-        <p className="text-xs text-[#2D7A51] font-medium">5432****8901</p>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="grid grid-cols-2 gap-3 mb-6 max-w-md">
-        <button
-          onClick={() => navigate("/add-money-usd")}
-          className="flex flex-col items-center justify-center gap-2 border border-gray-200 rounded-xl py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          <span className="w-9 h-9 rounded-full bg-[#E0F3E9] flex items-center justify-center">
-            <Plus size={16} className="text-[#2D7A51]" />
-          </span>
-          Add Money
-        </button>
-        <button
-          onClick={() => navigate("/convert")}
-          className="flex flex-col items-center justify-center gap-2 border border-gray-200 rounded-xl py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          <span className="w-9 h-9 rounded-full bg-[#E0F3E9] flex items-center justify-center">
-            <ArrowLeftRight size={16} className="text-[#2D7A51]" />
-          </span>
-          Convert
-        </button>
-      </div>
-
-      {/* Transaction Limit */}
-      <div className="mb-6">
-        <p className="text-xs font-bold text-gray-800 mb-3 uppercase tracking-wide">
-          Transaction Limit
+        <p className="text-xs text-gray-400 mb-4">
+          ≈ ₦{ngnEquivalent.toLocaleString(undefined, { minimumFractionDigits: 0 })} at
+          today's rate
         </p>
-        <TransactionLimitBar
-          label="Daily Transfer"
-          used={100000}
-          limit={10000000}
-          currency="USD"
-        />
-        <TransactionLimitBar
-          label="Per Transaction"
-          used={300000}
-          limit={1000000}
-          currency="USD"
+
+        <div className="flex flex-col sm:flex-row items-stretch gap-3">
+          <button
+            onClick={() => navigate("/convert")}
+            className="flex-1 flex items-center justify-center gap-2 bg-[#2D7A51] text-white text-sm font-semibold rounded-xl px-5 py-3 hover:bg-green-700 transition-colors"
+          >
+            <ArrowLeftRight className="w-4 h-4" />
+            Convert to NGN
+          </button>
+          <button
+            onClick={() => navigate("/add-money-usd")}
+            className="flex-1 flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 text-sm font-semibold rounded-xl px-5 py-3 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+          >
+            <ArrowDownToLine className="w-4 h-4" />
+            Add Money
+          </button>
+        </div>
+      </div>
+      <div className="mb-6">
+        <ReceiveOnlyBanner />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5 mb-6">
+        <UsdBankDetailsCard details={usdBankDetails} />
+        <ConversionSidePanel
+          ngnBalance={ngnBalance}
+          liveRate={liveRate}
+          onConvert={() => navigate("/convert")}
         />
       </div>
 
-      <FxRateCard {...fxRate} />
-
-      <TransactionHistory transactions={transactions} />
-
-      {/* Floating AI Assistant button */}
+      <TransactionHistory transactions={usdTransactions} />
       <button
         onClick={() => setShowAi(true)}
         className="fixed bottom-6 right-6 w-12 h-12 bg-[#2D7A51] rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition z-40"

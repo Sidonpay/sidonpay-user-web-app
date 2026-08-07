@@ -1,6 +1,14 @@
 import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
-import type { Transaction, SavedCard } from "../types/wallet";
+import type {
+  Transaction,
+  SavedCard,
+  UsdBankDetails,
+  LiveRate,
+  WalletCurrency,
+  ConversionQuote,
+  ConversionRecord,
+} from "../types/wallet";
 
 interface WalletContextType {
   ngnBalance: number;
@@ -8,11 +16,23 @@ interface WalletContextType {
   ngnTransactions: Transaction[];
   usdTransactions: Transaction[];
   savedCards: SavedCard[];
+  usdBankDetails: UsdBankDetails;
+  liveRate: LiveRate;
+  conversions: ConversionRecord[];
+  maxConversionUsd: number;
   addTransaction: (transaction: Transaction) => void;
   getDailyOutgoingTotal: (currency: "NGN" | "USD") => number;
   addCard: (card: SavedCard) => void;
   removeCard: (id: string) => void;
   setDefaultCard: (id: string) => void;
+  convertUsdToNgn: (amountUsd: number) => void;
+  getWalletBalance: (currency: WalletCurrency) => number;
+  createQuote: (
+    fromCurrency: WalletCurrency,
+    toCurrency: WalletCurrency,
+    amount: number
+  ) => ConversionQuote;
+  confirmConversion: (quote: ConversionQuote) => ConversionRecord;
 }
 
 const daysAgo = (n: number): string => {
@@ -20,6 +40,10 @@ const daysAgo = (n: number): string => {
   d.setDate(d.getDate() - n);
   return d.toISOString().split("T")[0];
 };
+
+const MAX_CONVERSION_USD = 5000;
+const SPREAD_PERCENT = 0.002;
+const QUOTE_TTL_MS = 2 * 60 * 1000;
 
 const initialNgnTransactions: Transaction[] = [
   {
@@ -134,16 +158,67 @@ const initialUsdTransactions: Transaction[] = [
     amount: 14280.50, currency: "USD",
   },
 ];
+
 const initialSavedCards: SavedCard[] = [];
+
+const initialUsdBankDetails: UsdBankDetails = {
+  accountHolder: "Mikasa Ackerman",
+  receivingBank: "Community Federal Savings Bank",
+  accountNumber: "3204-8811-0029",
+  routingNumber: "026073150",
+  swiftCode: "FBNINGLAXX",
+  bankAddress: "35-19 Jamaica Avenue, Woodhaven, NY 11421, USA",
+};
+
+const initialLiveRate: LiveRate = {
+  usdToNgn: 1620,
+  updatedAgo: "30s ago",
+  conversionFeePercent: 0.5,
+  processingTime: "Instant",
+};
+
+const initialConversions: ConversionRecord[] = [
+  {
+    id: "fx1", reference: "FX-2026-88412", fromCurrency: "USD", toCurrency: "NGN",
+    amount: 500, rate: 1580, received: 788000, date: "2026-07-27", displayDate: "2026-07-27",
+    time: "10:24 AM", status: "successful",
+  },
+  {
+    id: "fx2", reference: "FX-2026-88398", fromCurrency: "NGN", toCurrency: "USD",
+    amount: 200000, rate: 0.000633, received: 125.5, date: "2026-07-26", displayDate: "2026-07-26",
+    time: "4:48 PM", status: "successful",
+  },
+  {
+    id: "fx3", reference: "FX-2026-88310", fromCurrency: "USD", toCurrency: "NGN",
+    amount: 1000, rate: 1578, received: 1570000, date: "2026-07-24", displayDate: "2026-07-24",
+    time: "9:02 AM", status: "successful",
+  },
+  {
+    id: "fx4", reference: "FX-2026-88201", fromCurrency: "USD", toCurrency: "NGN",
+    amount: 250, rate: 1581, received: 393750, date: "2026-07-21", displayDate: "2026-07-21",
+    time: "2:15 PM", status: "pending",
+  },
+  {
+    id: "fx5", reference: "FX-2026-88098", fromCurrency: "NGN", toCurrency: "USD",
+    amount: 50000, rate: 0.000631, received: 31, date: "2026-07-18", displayDate: "2026-07-18",
+    time: "11:30 AM", status: "failed",
+  },
+];
+
+const generateReference = (): string =>
+  `FX-2026-${Math.floor(80000 + Math.random() * 9999)}`;
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
 export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [ngnBalance, setNgnBalance] = useState<number>(20000000.0);
-  const [usdBalance, setUsdBalance] = useState<number>(0.0);
+  const [usdBalance, setUsdBalance] = useState<number>(1847.50);
   const [ngnTransactions, setNgnTransactions] = useState<Transaction[]>(initialNgnTransactions);
   const [usdTransactions, setUsdTransactions] = useState<Transaction[]>(initialUsdTransactions);
   const [savedCards, setSavedCards] = useState<SavedCard[]>(initialSavedCards);
+  const [usdBankDetails] = useState<UsdBankDetails>(initialUsdBankDetails);
+  const [liveRate] = useState<LiveRate>(initialLiveRate);
+  const [conversions, setConversions] = useState<ConversionRecord[]>(initialConversions);
 
   const addTransaction = (transaction: Transaction) => {
     if (transaction.currency === "NGN") {
@@ -182,18 +257,186 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       const filtered = prev.filter((c) => c.id !== id);
       const removedCard = prev.find((c) => c.id === id);
       if (removedCard?.isDefault && filtered.length > 0) {
-        return filtered.map((c, i) =>
-          i === 0 ? { ...c, isDefault: true } : c
-        );
+        return filtered.map((c, i) => (i === 0 ? { ...c, isDefault: true } : c));
       }
       return filtered;
     });
   };
 
   const setDefaultCard = (id: string) => {
-    setSavedCards((prev) =>
-      prev.map((c) => ({ ...c, isDefault: c.id === id }))
-    );
+    setSavedCards((prev) => prev.map((c) => ({ ...c, isDefault: c.id === id })));
+  };
+
+  const getWalletBalance = (currency: WalletCurrency): number =>
+    currency === "USD" ? usdBalance : ngnBalance;
+
+  const convertUsdToNgn = (amountUsd: number) => {
+    if (amountUsd <= 0 || amountUsd > usdBalance) return;
+
+    const feeUsd = amountUsd * (liveRate.conversionFeePercent / 100);
+    const netUsd = amountUsd - feeUsd;
+    const ngnCredited = netUsd * liveRate.usdToNgn;
+    const today = new Date().toISOString().split("T")[0];
+    const sharedId = Date.now();
+
+    setUsdBalance((prev) => prev - amountUsd);
+    setUsdTransactions((prev) => [
+      {
+        id: `usd-fx-${sharedId}`,
+        txnId: `TXN-${Math.floor(90000000 + Math.random() * 9999999)}`,
+        description: "USD → NGN via SidonPay",
+        subLabel: "FX · Conversion",
+        date: today,
+        displayDate: today,
+        type: "fx",
+        status: "Successful",
+        amount: -amountUsd,
+        currency: "USD",
+        subAmount: -feeUsd,
+        subCurrency: "USD",
+      },
+      ...prev,
+    ]);
+
+    setNgnBalance((prev) => prev + ngnCredited);
+    setNgnTransactions((prev) => [
+      {
+        id: `ngn-fx-${sharedId}`,
+        txnId: `TXN-${Math.floor(90000000 + Math.random() * 9999999)}`,
+        description: "NGN ← USD via SidonPay",
+        subLabel: "FX · Conversion",
+        date: today,
+        displayDate: today,
+        type: "fx",
+        status: "Successful",
+        amount: ngnCredited,
+        currency: "NGN",
+      },
+      ...prev,
+    ]);
+  };
+
+  const createQuote = (
+    fromCurrency: WalletCurrency,
+    toCurrency: WalletCurrency,
+    amount: number
+  ): ConversionQuote => {
+    const midRate = fromCurrency === "USD" ? liveRate.usdToNgn : 1 / liveRate.usdToNgn;
+    const appliedRate = midRate * (1 - SPREAD_PERCENT);
+    const fxSpread = amount * midRate * SPREAD_PERCENT;
+    const feeFromCurrency = amount * (liveRate.conversionFeePercent / 100);
+    const feeToCurrency = feeFromCurrency * appliedRate;
+    const receivable = amount * appliedRate - feeToCurrency;
+    const now = Date.now();
+
+    return {
+      id: `quote-${now}`,
+      fromCurrency,
+      toCurrency,
+      amount,
+      midRate,
+      appliedRate,
+      fxSpread,
+      feeFromCurrency,
+      feeToCurrency,
+      receivable,
+      createdAt: now,
+      expiresAt: now + QUOTE_TTL_MS,
+    };
+  };
+
+  const confirmConversion = (quote: ConversionQuote): ConversionRecord => {
+    const { fromCurrency, toCurrency, amount, appliedRate, receivable } = quote;
+    const now = new Date();
+    const today = now.toISOString().split("T")[0];
+    const time = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    const reference = generateReference();
+    const sharedId = Date.now();
+
+    if (fromCurrency === "USD") {
+      setUsdBalance((prev) => prev - amount);
+      setNgnBalance((prev) => prev + receivable);
+      setUsdTransactions((prev) => [
+        {
+          id: `usd-fx-${sharedId}`,
+          txnId: `TXN-${Math.floor(90000000 + Math.random() * 9999999)}`,
+          description: "USD → NGN via SidonPay",
+          subLabel: `FX · ${reference}`,
+          date: today,
+          displayDate: today,
+          type: "fx",
+          status: "Successful",
+          amount: -amount,
+          currency: "USD",
+        },
+        ...prev,
+      ]);
+      setNgnTransactions((prev) => [
+        {
+          id: `ngn-fx-${sharedId}`,
+          txnId: `TXN-${Math.floor(90000000 + Math.random() * 9999999)}`,
+          description: "NGN ← USD via SidonPay",
+          subLabel: `FX · ${reference}`,
+          date: today,
+          displayDate: today,
+          type: "fx",
+          status: "Successful",
+          amount: receivable,
+          currency: "NGN",
+        },
+        ...prev,
+      ]);
+    } else {
+      setNgnBalance((prev) => prev - amount);
+      setUsdBalance((prev) => prev + receivable);
+      setNgnTransactions((prev) => [
+        {
+          id: `ngn-fx-${sharedId}`,
+          txnId: `TXN-${Math.floor(90000000 + Math.random() * 9999999)}`,
+          description: "NGN → USD via SidonPay",
+          subLabel: `FX · ${reference}`,
+          date: today,
+          displayDate: today,
+          type: "fx",
+          status: "Successful",
+          amount: -amount,
+          currency: "NGN",
+        },
+        ...prev,
+      ]);
+      setUsdTransactions((prev) => [
+        {
+          id: `usd-fx-${sharedId}`,
+          txnId: `TXN-${Math.floor(90000000 + Math.random() * 9999999)}`,
+          description: "USD ← NGN via SidonPay",
+          subLabel: `FX · ${reference}`,
+          date: today,
+          displayDate: today,
+          type: "fx",
+          status: "Successful",
+          amount: receivable,
+          currency: "USD",
+        },
+        ...prev,
+      ]);
+    }
+
+    const record: ConversionRecord = {
+      id: `fx-${sharedId}`,
+      reference,
+      fromCurrency,
+      toCurrency,
+      amount,
+      rate: appliedRate,
+      received: receivable,
+      date: today,
+      displayDate: today,
+      time,
+      status: "successful",
+    };
+
+    setConversions((prev) => [record, ...prev]);
+    return record;
   };
 
   return (
@@ -204,11 +447,19 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         ngnTransactions,
         usdTransactions,
         savedCards,
+        usdBankDetails,
+        liveRate,
+        conversions,
+        maxConversionUsd: MAX_CONVERSION_USD,
         addTransaction,
         getDailyOutgoingTotal,
         addCard,
         removeCard,
         setDefaultCard,
+        convertUsdToNgn,
+        getWalletBalance,
+        createQuote,
+        confirmConversion,
       }}
     >
       {children}

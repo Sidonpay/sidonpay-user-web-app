@@ -20,8 +20,6 @@ const VerifyEmailModal = ({ onClose, onVerified, currentEmail }: Props) => {
   const [countdown, setCountdown] = useState(RESEND_TIMER);
   const [isVerifying, setIsVerifying] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  // countdown when OTP step begins
   useEffect(() => {
     if (step !== "otp") return;
     if (countdown <= 0) return;

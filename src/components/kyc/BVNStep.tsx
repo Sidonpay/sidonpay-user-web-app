@@ -40,7 +40,7 @@ const BVNStep = () => {
     if (!validate()) return;
     updateProfile({ bvn });
 
-    // Mock BVN verification — demo rule: BVN starting with "1" simulates invalid.
+    // Mock BVN verification demo rule: BVN starting with "1" simulates invalid.
     if (bvn.startsWith("1")) {
       setBvnInvalid(true);
       return;

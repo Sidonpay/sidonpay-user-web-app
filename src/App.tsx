@@ -31,6 +31,7 @@ import { WalletProvider } from "./context/WalletContext";
 import BankTransferPage from "./pages/BankTransferPage";
 import UssdPaymentPage from "./pages/UssdPaymentPage";
 import Onboarding from "./pages/Onboarding";
+import ConvertPage from "./pages/ConvertPage";
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -41,42 +42,43 @@ const App: React.FC = () => {
     <Router>
       <WalletProvider>
       <Routes>
-        {/* Public marketing pages */}
+    
         <Route path="/" element={<Landing />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/help" element={<HelpPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/onboarding" element={<Onboarding/>} />
 
-        {/* Auth */}
+      
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/verify-account" element={<VerifyAccount />} />
       
 
-        {/* Dashboard */}
+       
         <Route path="/dashboard" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Dashboard /></ProtectedRoute>} />
         <Route path="/dashboard/account" element={<ProtectedRoute isLoggedIn={isLoggedIn}><AccountPage /></ProtectedRoute>} />
         <Route path="/dashboard/account/change-email" element={<ProtectedRoute isLoggedIn={isLoggedIn}><ChangeEmailPage /></ProtectedRoute>} />
         <Route path="/dashboard/account/setup-pin" element={<ProtectedRoute isLoggedIn={isLoggedIn}><SetupPinPage /></ProtectedRoute>} />
         <Route path="/transfer" element={<ProtectedRoute isLoggedIn={isLoggedIn}><Transfer /></ProtectedRoute>} />
 
-        {/* Wallets */}
+      
         <Route path="/ngn-wallet" element={<ProtectedRoute isLoggedIn={isLoggedIn}><NgnWalletPage /></ProtectedRoute>} />
         <Route path="/usd-wallet" element={<ProtectedRoute isLoggedIn={isLoggedIn}><UsdWalletPage /></ProtectedRoute>} />
 
-        {/* Add Money — NGN only for now */}
+       
         <Route path="/add-money" element={<ProtectedRoute isLoggedIn={isLoggedIn}><AddMoneyPage /></ProtectedRoute>} />
         <Route path="/card-funding" element={<ProtectedRoute isLoggedIn={isLoggedIn}><CardFundingPage /></ProtectedRoute>} />
         <Route path="/card-receipt" element={<ProtectedRoute isLoggedIn={isLoggedIn}><CardReceiptPage /></ProtectedRoute>} />
         <Route path="/bank-transfer" element={<ProtectedRoute isLoggedIn={isLoggedIn}><BankTransferPage/></ProtectedRoute>} />
         <Route path="/add-money/ussd" element={<ProtectedRoute isLoggedIn={isLoggedIn}><UssdPaymentPage/></ProtectedRoute>} />
+        <Route path="/convert" element={<ProtectedRoute isLoggedIn={isLoggedIn}><ConvertPage/></ProtectedRoute>}/>
 
-        {/* Card Management */}
+        
         <Route path="/manage-cards" element={<ProtectedRoute isLoggedIn={isLoggedIn}><ManageCardsPage /></ProtectedRoute>} />
         <Route path="/add-card" element={<ProtectedRoute isLoggedIn={isLoggedIn}><AddCardPage /></ProtectedRoute>} />
 
-        {/* Dashboard Help */}
+      
         <Route path="/dashboard/help" element={<ProtectedRoute isLoggedIn={isLoggedIn}><HelpCentre /></ProtectedRoute>} />
         <Route path="/dashboard/help/categories" element={<ProtectedRoute isLoggedIn={isLoggedIn}><HelpCategories /></ProtectedRoute>} />
         <Route path="/dashboard/help/categories/:id" element={<ProtectedRoute isLoggedIn={isLoggedIn}><HelpCategoryDetail /></ProtectedRoute>} />

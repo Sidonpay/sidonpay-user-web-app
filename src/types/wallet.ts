@@ -55,3 +55,52 @@ export interface TransactionFilters {
   types: TransactionType[];
   statuses: TransactionStatus[];
 }
+
+export interface UsdBankDetails {
+  accountHolder: string;
+  receivingBank: string;
+  accountNumber: string;
+  routingNumber: string;
+  swiftCode: string;
+  bankAddress: string;
+}
+
+export interface LiveRate {
+  usdToNgn: number;
+  updatedAgo: string;
+  conversionFeePercent: number;
+  processingTime: string;
+}
+
+export type WalletCurrency = "USD" | "NGN";
+
+export interface ConversionQuote {
+  id: string;
+  fromCurrency: WalletCurrency;
+  toCurrency: WalletCurrency;
+  amount: number;
+  midRate: number;
+  appliedRate: number;
+  fxSpread: number;
+  feeFromCurrency: number;
+  feeToCurrency: number;
+  receivable: number;
+  createdAt: number;
+  expiresAt: number;
+}
+
+export type ConversionStatus = "successful" | "pending" | "failed" | "reversed";
+
+export interface ConversionRecord {
+  id: string;
+  reference: string;
+  fromCurrency: WalletCurrency;
+  toCurrency: WalletCurrency;
+  amount: number;
+  rate: number;
+  received: number;
+  date: string;
+  displayDate: string;
+  time: string;
+  status: ConversionStatus;
+}

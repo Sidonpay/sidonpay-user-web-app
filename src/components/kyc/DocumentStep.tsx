@@ -23,7 +23,7 @@ const UploadSlot: React.FC<UploadSlotProps> = ({
 
   const handleFile = (file: File) => {
     setUploading(true);
-    // Mock upload delay — replace with real upload API call.
+    // Mock upload delay replace with real upload API call, you gettt.
     setTimeout(() => {
       onUpload(file.name);
       setUploading(false);

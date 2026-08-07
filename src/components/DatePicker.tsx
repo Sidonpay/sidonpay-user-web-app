@@ -1,4 +1,4 @@
- import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 
 interface Props {
@@ -123,8 +123,6 @@ const DatePicker = ({
 
   return (
     <div className="relative w-full" ref={ref}>
-
-      {/* ── Input row — always visible, never unmounts ── */}
       <div
         className={`flex items-center w-full border rounded-xl transition-all duration-150 bg-white ${
           isEditing
@@ -139,8 +137,6 @@ const DatePicker = ({
           onClick={() => { if (isEditing) setOpen((p) => !p); }}
           className="flex-1 px-4 py-3 text-sm bg-transparent outline-none text-gray-800 placeholder-gray-400 cursor-pointer"
         />
-
-        {/* Edit button — when not editing */}
         {!isEditing && (
           <button
             onClick={onEdit}
@@ -149,8 +145,6 @@ const DatePicker = ({
             Edit
           </button>
         )}
-
-        {/* Calendar icon — when editing */}
         {isEditing && (
           <button
             onClick={(e) => { e.stopPropagation(); setOpen((p) => !p); }}
@@ -160,12 +154,8 @@ const DatePicker = ({
           </button>
         )}
       </div>
-
-      {/* Calendar dropdown */}
       {open && isEditing && (
         <div className="absolute top-full left-0 z-[200] mt-1 bg-white border border-gray-200 rounded-2xl shadow-2xl p-4 w-72">
-
-          {/* Calendar Mode */}
           {mode === "calendar" && (
             <>
               <div className="flex items-center justify-between mb-3">
